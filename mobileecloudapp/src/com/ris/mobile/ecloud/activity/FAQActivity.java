@@ -1,0 +1,306 @@
+package com.ris.mobile.ecloud.activity;
+
+import java.util.ArrayList;
+import java.util.Random; 
+
+import android.content.ContentValues;
+import android.content.Context; 
+import android.content.Intent;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
+import roboguice.inject.InjectView;
+
+import com.ris.mobile.ecloud.R; 
+import com.ris.mobile.ecloud.adapter.FAQExpandAdapter;
+import com.ris.mobile.ecloud.adapter.FAQExpandAdapter.HandleClick;
+import com.ris.mobile.ecloud.BaseActivity;
+import com.ris.mobile.ecloud.LApplication;
+ 
+import com.ris.mobile.ecloud.log.CommonLog;
+import com.ris.mobile.ecloud.log.LogFactory;
+import com.ris.mobile.ecloud.object.ConnectErrorObject;
+import com.ris.mobile.ecloud.object.FAQObject;
+import com.ris.mobile.ecloud.object.RequestObject;
+import com.ris.mobile.ecloud.parser.BaseParser;
+import com.ris.mobile.ecloud.parser.FAQListParser;
+import com.ris.mobile.ecloud.util.CommonUtil;
+import com.ris.mobile.ecloud.util.SharedPreferenceUtil;
+import com.ris.mobile.ecloud.widget.DelEditText;  
+import com.ris.mobile.ecloud.widget.PullToRefreshLayout;
+import com.ris.mobile.ecloud.widget.PullToRefreshLayout.OnRefreshListener;
+import com.ris.mobile.ecloud.widget.pullableview.PullableExpandableListView;
+
+import android.content.Context;
+import android.graphics.Rect;
+import android.os.Bundle;  
+import android.os.Handler;
+import android.os.Message;
+import android.support.v4.app.Fragment;  
+import android.text.InputType;
+import android.view.LayoutInflater;  
+import android.view.MotionEvent;
+import android.view.View;  
+import android.view.View.OnTouchListener;
+import android.view.ViewGroup;  
+import android.view.View.OnClickListener;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.ExpandableListView;
+import android.widget.ExpandableListView.OnGroupClickListener;
+import android.widget.TextView; 
+import android.widget.Toast;
+      
+public class FAQActivity  extends BaseActivity implements    HandleClick, OnRefreshListener ,OnClickListener{  
+ 
+	
+	@InjectView (R.id.tv_Back) 
+	private TextView tvBack;
+	
+	@InjectView (R.id.tv_Title)
+	private TextView tvTitle; 
+	
+	@InjectView (R.id.tv_Right)
+	private TextView tvRight;
+	
+	@InjectView (R.id.lv_FAQ)
+	private PullableExpandableListView lvFAQ;
+	
+	@InjectView (R.id.refresh_view)
+	private PullToRefreshLayout refreshView;
+	
+	
+ 
+	public static LApplication lApplication=LApplication.getInstance();
+	private Context mContext; 
+	
+	private List<FAQObject> data;
+	private FAQExpandAdapter mAdapter; 
+	private int lastClick = -1; 
+	private int pageIndex=1;
+	private int pageSize=15;
+	private SharedPreferenceUtil sharedPreferenceUtil; 
+	
+ 
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_faq);
+		initData(getIntent()); 
+		initView();
+		setListener();
+	 
+	}
+	
+	public    void initData(Intent intent){ 
+		mContext=FAQActivity.this;
+		sharedPreferenceUtil=new SharedPreferenceUtil(mContext);
+	}
+	
+	 
+	
+	
+	public void initView(){
+	  	  
+		tvBack.setVisibility(View.VISIBLE);
+    	tvTitle.setVisibility(View.VISIBLE);
+    	tvTitle.setText(R.string.title_faq);
+    	tvRight.setVisibility(View.INVISIBLE);
+    	
+    	int width =  getWindowManager().getDefaultDisplay().getWidth();
+    	lvFAQ.setIndicatorBounds(width-40, width-10);
+    	 
+    	data =  new ArrayList<FAQObject>(); 
+    	
+    	mAdapter = new FAQExpandAdapter(mContext,data); 
+        mAdapter.setHnadleClick (FAQActivity.this);  
+        lvFAQ.setAdapter(mAdapter);  
+        refreshView.autoRefresh();
+        /*
+    	BaseParser<List<FAQObject>> responseParser = new FAQListParser();
+    	HashMap<String, String> requestDataMap=new HashMap<String, String>(); 
+		requestDataMap.put("pageNo",  new Integer(pageIndex).toString() );
+		requestDataMap.put("pageSize", new Integer(pageSize).toString()  ); 
+		
+		
+		
+
+		RequestObject vo = new RequestObject(R.string.url_faqlist, mContext, requestDataMap, responseParser); 
+		getDataFromServer(vo, new  DataCallback<List<FAQObject>>() {
+			@Override
+			public void processData(List<FAQObject> paramObject, boolean paramBoolean) { 
+				 
+		    	if(paramObject!=null)
+		    		data.addAll(paramObject); 
+		        
+				return;
+			}
+			@Override
+    		public void processError(ConnectErrorObject responseErrorVo){ 
+				FAQActivity.this.DisPlay("error",responseErrorVo.getErrInfo());
+				 
+    		}
+		} );*/ 
+    	 
+      }
+	
+	
+    
+   
+    public void setListener(){
+    	tvBack.setOnClickListener(this); 
+    	 
+    	
+    	refreshView.setOnRefreshListener(this);
+    	
+    	lvFAQ.setOnGroupClickListener(new OnGroupClickListener() {  
+            public boolean onGroupClick(ExpandableListView parent, View v,  
+                    int groupPosition, long id) {   
+                if(lastClick == -1)  
+                {  
+                	lvFAQ.expandGroup(groupPosition);  
+                }   
+                if(lastClick != -1 && lastClick != groupPosition)  
+                {  
+                	lvFAQ.collapseGroup(lastClick);  
+                	lvFAQ.expandGroup(groupPosition);  
+                }  
+                else if(lastClick == groupPosition)   
+                {  
+                    if(lvFAQ.isGroupExpanded(groupPosition))  
+                    	lvFAQ.collapseGroup(groupPosition);  
+                    else if(!lvFAQ.isGroupExpanded(groupPosition))  
+                    	lvFAQ.expandGroup(groupPosition);  
+                }  
+                  
+                lastClick = groupPosition;  
+                return true;  
+            }  
+        });  
+    	 
+    	
+    }
+    
+    
+	@Override
+	public void onClick(View v) {
+		// TODO Auto-generated method stub
+		switch (v.getId()) {
+		  case R.id.tv_Back:
+			 this.finish();
+			 break; 
+	    }
+		
+		
+	} 
+	@Override
+	public void onStart() {
+		super.onStart();
+	
+	}
+
+	
+	public boolean onLoadData(  final PullToRefreshLayout pullToRefreshLayout, final boolean isRefresh) {
+		 
+		
+		if (isRefresh) {  
+		    pageIndex=1;
+		    data.clear();
+        } else {   
+        	pageIndex++;    
+        }  
+	    pageIndex=pageIndex<1?1:pageIndex;
+	    
+        BaseParser<List<FAQObject>> responseParser = new FAQListParser();
+        
+		HashMap<String, String> requestDataMap=new HashMap<String, String>();
+		 
+		requestDataMap.put("pageNo",  new Integer(pageIndex).toString() );
+		requestDataMap.put("pageSize", new Integer(pageSize).toString()  );  
+		
+		
+			
+		RequestObject vo = new RequestObject(R.string.url_faqlist, mContext, requestDataMap, responseParser); 
+	    getDataFromServer(vo, new  DataCallback<List<FAQObject>>() {
+				@Override
+				public void processData(List<FAQObject> paramObject, boolean paramBoolean) { 
+					 
+			    	if(paramObject!=null&&paramObject.size()>0)
+			    		data.addAll(paramObject);
+			    	else
+			    		pageIndex--; 
+			    	mAdapter.notifyDataSetChanged();
+			    	if (isRefresh)
+			    		pullToRefreshLayout.refreshFinish(PullToRefreshLayout.SUCCEED);
+			    	else
+			    		pullToRefreshLayout.loadmoreFinish(PullToRefreshLayout.SUCCEED);
+					return  ;
+				}
+				@Override
+	    		public void processError(ConnectErrorObject responseErrorVo){ 
+					FAQActivity.this.DisPlay("error",responseErrorVo.getErrInfo());
+					 
+	    		}
+		},false); 
+	     
+    	 
+    	 
+        return false;   
+	}
+	
+	 
+	@Override
+	public void onRefresh(final PullToRefreshLayout pullToRefreshLayout)
+	{
+		// 下拉刷新操作
+		 
+		/*new Handler()
+		{
+			@Override
+			public void handleMessage(Message msg)
+			{
+				// 千万别忘了告诉控件刷新完毕了哦！
+				pullToRefreshLayout.refreshFinish(PullToRefreshLayout.SUCCEED);
+			}
+		}.sendEmptyMessageDelayed(0, 1000);*/
+		
+		
+		onLoadData(pullToRefreshLayout,true); 
+		//pullToRefreshLayout.refreshFinish(PullToRefreshLayout.SUCCEED);
+	}
+
+	@Override
+	public void onLoadMore(final PullToRefreshLayout pullToRefreshLayout)
+	{
+		// 加载操作
+		/*log.e("onLoadMore");
+		new Handler()
+		{
+			@Override
+			public void handleMessage(Message msg)
+			{
+				// 千万别忘了告诉控件加载完毕了哦！
+				pullToRefreshLayout.loadmoreFinish(PullToRefreshLayout.SUCCEED);
+			}
+		}.sendEmptyMessageDelayed(0, 1000);*/
+		onLoadData(pullToRefreshLayout,false); 
+		//pullToRefreshLayout.loadmoreFinish(PullToRefreshLayout.SUCCEED);
+	}	
+	
+
+	@Override
+	public void handleClick(int type) {
+		 Toast.makeText(FAQActivity.this, "...点了一下...", Toast.LENGTH_SHORT).show(); 
+		
+	}
+	@Override
+	public void onDestroy(){
+		 
+		super.onDestroy();
+	}
+	
+	 
+
+}  

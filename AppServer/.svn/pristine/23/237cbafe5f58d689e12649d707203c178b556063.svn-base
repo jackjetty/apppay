@@ -1,0 +1,282 @@
+package com.rising.appserver.action;
+import java.io.IOException; 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.Date;
+import java.util.HashMap; 
+import java.util.Iterator;
+import java.util.Map; 
+import java.util.Random;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;  
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.dom4j.DocumentException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody; 
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.rising.appserver.bean.RespError;
+import com.rising.appserver.common.BaseAction;
+import com.rising.appserver.common.CommonUtil;
+import com.rising.appserver.service.ChargeService;
+import com.rising.appserver.service.QQAgentService;
+import com.alipay.config.*;
+import com.alipay.util.*;
+@Controller
+@RequestMapping("/qqAgent")
+public class QQAgent extends BaseAction{
+	
+	private Log log = LogFactory.getLog(QQAgent.class);
+	
+	
+	@Autowired
+	private QQAgentService qqAgentService;
+
+	private static String[] parameterMust = { "PhoneNumber", "BusId",
+			"TargetNumber" }; 
+	
+	@RequestMapping("/qqServiceConfig")
+	public void qqServiceConfig(HttpServletRequest request,
+			HttpServletResponse response) {
+		HashMap<String, String> paraMap = null;
+		HashMap<String,Object> result = new HashMap<String,Object>();
+		String resultGson; 
+		try {
+			paraMap = getParameterFromRequest(request);
+			if (CheckParameter(parameterMust, paraMap)) { 
+				String parameter = mapToString(paraMap);
+				resultGson = qqAgentService.qqServiceConfig(parameter,request);
+			} else {
+				result.put("respCode", -100);
+				result.put("respInfo", "App发送数据错误!");
+				resultGson = new Gson().toJson(result);
+			}
+		} catch (DocumentException e) {
+			result.put("respCode",-101);
+			result.put("respInfo", "App发送xml报文格式出错!");
+			resultGson = new Gson().toJson(result);
+			log.error("userRegister()->App发送xml报文格式出错!"+e.toString());
+		} catch (IOException e) {
+			result.put("respCode",-200);
+			result.put("respInfo", "读取请求xml报文出错！");
+			resultGson = new Gson().toJson(result);
+			log.error("userRegister()->读取请求xml报文出错！"+e.toString());
+		}
+		writerGson(resultGson,request, response);
+	}
+	
+	
+	
+	@RequestMapping("/qqGameConfig")
+	public void qqGameConfig(HttpServletRequest request,
+			HttpServletResponse response) {
+		HashMap<String, String> paraMap = null;
+		HashMap<String,Object> result = new HashMap<String,Object>();
+		String resultGson; 
+		try {
+			paraMap = getParameterFromRequest(request); 
+			String parameter = mapToString(paraMap);
+			resultGson = qqAgentService.qqGameConfig(parameter,request);
+			 
+		} catch (DocumentException e) {
+			result.put("respCode",-101);
+			result.put("respInfo", "App发送xml报文格式出错!");
+			resultGson = new Gson().toJson(result);
+			log.error("userRegister()->App发送xml报文格式出错!"+e.toString());
+		} catch (IOException e) {
+			result.put("respCode",-200);
+			result.put("respInfo", "读取请求xml报文出错！");
+			resultGson = new Gson().toJson(result);
+			log.error("userRegister()->读取请求xml报文出错！"+e.toString());
+		}
+		writerGson(resultGson,request, response);
+	}
+	
+	
+	//返回结果需要通过resultStatus以及result字段的值来综合判断并确定支付结果。在resultStatus=9000，并且success="true"以及sign="xxx"校验通过的情况下，证明支付成功
+	@RequestMapping("/qqPayNotice")
+	public @ResponseBody String qqPayNotice(HttpServletRequest request,
+			HttpServletResponse response){ 
+		//获取支付宝POST过来反馈信息
+		String trade_status = CommonUtil.trim((request.getParameter("trade_status")));
+		if(trade_status.equalsIgnoreCase("WAIT_BUYER_PAY")){
+			return "success";
+		} 
+		
+		Map<String,String> params = new HashMap<String,String>();
+		Map requestParams = request.getParameterMap();
+		for (Iterator iter = requestParams.keySet().iterator(); iter.hasNext();) {
+			String name = (String) iter.next();
+			String[] values = (String[]) requestParams.get(name);
+			String valueStr = "";
+			for (int i = 0; i < values.length; i++) {
+				valueStr = (i == values.length - 1) ? valueStr + values[i]
+						: valueStr + values[i] + ",";
+			} 
+			params.put(name, valueStr);
+			//paramBuffer.append(name).append("=").append(valueStr).append("$"); 
+		}
+		String headinfo="";
+		Date curDate=new Date();
+		headinfo+=CommonUtil.doDateForm(curDate, "yyyy-MM-dd HH:mm:ss");
+		Random random= new Random();
+		headinfo+=CommonUtil.castString(random.nextInt(1000), "000"); 
+		StringBuffer paramBuffer=new StringBuffer(""); 
+		
+		String parameter=AlipayCore.createLinkString(params);
+		paramBuffer.append(headinfo);
+		paramBuffer.append("   ");
+		paramBuffer.append(parameter);
+		paramBuffer.append("\n");
+		AlipayCore.logResult(paramBuffer.toString());
+		String resultGson=""; 
+		Gson gson = new Gson();   
+		RespError respError=new RespError();
+		respError.setRespCode(0);
+		respError.setRespInfo("");
+		String signType="RSA"; 
+		 
+		//验证成功
+		if(AlipayNotify.verify(params,signType)){ 
+			try {
+				resultGson=qqAgentService.qqPayNotice(parameter,request);
+				resultGson = URLDecoder.decode(resultGson,"UTF-8"); 
+				respError=gson.fromJson(resultGson,  RespError.class); 
+				
+			}catch (Exception ex) {
+				respError.setRespCode(99);
+				respError.setRespInfo(ex.getMessage()); 
+			}
+			
+		}else{ 
+			respError.setRespCode(1998);
+			respError.setRespInfo("fail");  
+			
+		} 
+		resultGson= new Gson().toJson(respError);
+		paramBuffer=new StringBuffer("");
+		paramBuffer.append(headinfo);
+		paramBuffer.append("   ");
+		paramBuffer.append(resultGson);
+		paramBuffer.append("\n"); 
+		AlipayCore.logResult(paramBuffer.toString());
+		if(respError.getRespCode()==0){ 
+			return "success";
+		} 
+		
+		if(respError.getRespCode()==1998){ 
+			return "fail";
+		}  
+		return "";
+		
+	}
+	@RequestMapping("/qqRefundNotice")
+	public @ResponseBody String qqRefundNotice(HttpServletRequest request,
+			HttpServletResponse response){ 
+		//获取支付宝POST过来反馈信息
+		String trade_status = CommonUtil.trim((request.getParameter("trade_status")));
+		if(trade_status.equalsIgnoreCase("WAIT_BUYER_PAY")){
+			return "success";
+		}  
+		Map<String,String> params = new HashMap<String,String>();
+		Map requestParams = request.getParameterMap();
+		for (Iterator iter = requestParams.keySet().iterator(); iter.hasNext();) {
+			String name = (String) iter.next();
+			String[] values = (String[]) requestParams.get(name);
+			String valueStr = "";
+			for (int i = 0; i < values.length; i++) {
+				valueStr = (i == values.length - 1) ? valueStr + values[i]
+						: valueStr + values[i] + ",";
+			} 
+			params.put(name, valueStr);
+			//paramBuffer.append(name).append("=").append(valueStr).append("$"); 
+		}
+		Date curDate=new Date();
+		String headinfo="";
+		headinfo+=CommonUtil.doDateForm(curDate, "yyyy-MM-dd HH:mm:ss");
+		Random random= new Random();
+		headinfo+=CommonUtil.castString(random.nextInt(1000), "000"); 
+		StringBuffer paramBuffer=new StringBuffer("");  
+		String parameter=AlipayCore.createLinkString(params);
+		paramBuffer.append(headinfo);
+		paramBuffer.append("   ");
+		paramBuffer.append(parameter);
+		paramBuffer.append("\n");
+		AlipayCore.logResult("refund",paramBuffer.toString());
+		String resultGson=""; 
+		Gson gson = new Gson();   
+		RespError respError=new RespError();
+		respError.setRespCode(0);
+		respError.setRespInfo("");
+		if(AlipayNotify.verify(params,"MD5")){//验证成功
+		 
+			try {
+				resultGson=qqAgentService.qqRefundNotice(parameter,request);
+				resultGson = URLDecoder.decode(resultGson,"UTF-8"); 
+				respError=gson.fromJson(resultGson,  RespError.class);  
+				
+				
+				
+			}catch (Exception ex) {
+				respError.setRespCode(99);
+				respError.setRespInfo(ex.getMessage()); 
+			}
+			
+		}else{ 
+			respError.setRespCode(1998);
+			respError.setRespInfo("fail");  
+			
+		}  
+		resultGson= new Gson().toJson(respError);
+		paramBuffer=new StringBuffer("");
+		paramBuffer.append(headinfo);
+		paramBuffer.append("   ");
+		paramBuffer.append(resultGson);
+		paramBuffer.append("\n"); 
+		AlipayCore.logResult("refund",paramBuffer.toString());
+		if(respError.getRespCode()==0){ 
+			return "success";
+		} 
+		
+		if(respError.getRespCode()==1998){ 
+			return "fail";
+		}  
+		return "";
+		
+	}
+	
+	@RequestMapping(value="/qqUnsubmitRefund", produces = "application/json; charset=utf-8")
+	public @ResponseBody String qqUnsubmitRefund(HttpServletRequest request,
+			HttpServletResponse response){ 
+		HashMap<String, String> paraMap = new HashMap<String, String>();
+		HashMap<String,Object> result = new HashMap<String,Object>();
+		String resultGson; 
+		String parameter = mapToString(paraMap);
+		resultGson = qqAgentService.qqUnsubmitRefund(parameter,request);
+	    try {
+			resultGson=URLDecoder.decode(resultGson,"utf-8") ;
+			resultGson= resultGson.replace("\\u00", "%") ;
+		    resultGson=  CommonUtil.unescape(resultGson) ;
+		    resultGson=resultGson.replace("#", "%23"); 
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} 
+		return resultGson ;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+}

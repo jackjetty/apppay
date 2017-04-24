@@ -1,0 +1,22 @@
+<div align="center"><img id="image1" src="ad-04.jpg" width="100%" height="100%" border="0" usemap="#Map"> 
+  <map name="Map">
+    <area  id="test" shape="rect" coords="0,198,1920,239" href="hbpay.apk">
+  </map>
+</div>
+
+<script type="text/javascript">
+
+var yWidth = 2157;
+var yHeight = 3595;
+var startX = 1403;
+var startY = 855;
+var endX = 1946;
+var endY = 1023
+var nowTotalWidth = document.getElementById("image1").width;
+var nowTotalHeight = document.getElementById("image1").height;
+var nowStartX = startX/yWidth*nowTotalWidth;
+var nowStartY = startY/yHeight*nowTotalHeight;
+var nowEndX = endX/yWidth*nowTotalWidth;
+var nowEndY = endY/yHeight*nowTotalHeight;
+document.getElementById("test").coords = ""+nowStartX+","+nowStartY+","+nowEndX+","+nowEndY;
+</script>

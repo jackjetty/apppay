@@ -1,0 +1,260 @@
+package com.ris.mobile.ecloud.activity;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Vector;
+
+import roboguice.inject.InjectView;
+
+import com.ris.mobile.ecloud.BaseActivity;
+import com.ris.mobile.ecloud.R;
+import com.ris.mobile.ecloud.LApplication;
+import com.ris.mobile.ecloud.adapter.ApplyBillAdapter;
+import com.ris.mobile.ecloud.log.CommonLog;
+import com.ris.mobile.ecloud.log.LogFactory;
+import com.ris.mobile.ecloud.object.AccountObject;
+import com.ris.mobile.ecloud.object.ConnectErrorObject; 
+import com.ris.mobile.ecloud.object.ICDealDetailObject;
+import com.ris.mobile.ecloud.object.ItemObject;
+import com.ris.mobile.ecloud.object.ParObject;
+import com.ris.mobile.ecloud.object.RequestObject;
+import com.ris.mobile.ecloud.object.ResponseObject;
+import com.ris.mobile.ecloud.parser.AccountParser;
+import com.ris.mobile.ecloud.parser.BaseParser;
+import com.ris.mobile.ecloud.parser.ICDealDetailParser;
+import com.ris.mobile.ecloud.parser.ResponseParser;
+import com.ris.mobile.ecloud.util.CommonUtil;
+import com.ris.mobile.ecloud.util.Constant;
+import com.ris.mobile.ecloud.util.SharedPreferenceUtil;
+import com.ris.mobile.ecloud.widget.ParDialog;
+import com.ris.mobile.ecloud.widget.ParDialog.OnAddressCListener;
+
+import android.app.Activity;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Vibrator;
+import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.SurfaceHolder;
+import android.view.SurfaceHolder.Callback;
+import android.view.SurfaceView;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.MotionEvent;
+import android.view.View.OnTouchListener;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+public class ICCardResActivity extends BaseActivity implements OnClickListener  {
+
+ 
+	private String tradeNo;
+	private String cardNo;
+	
+	@InjectView (R.id.tv_Back) 
+	private TextView tvBack;
+	
+	@InjectView (R.id.tv_Title) 
+	private TextView tvTitle;
+	
+	@InjectView (R.id.tv_Right) 
+	private TextView tvRight;
+	
+	@InjectView (R.id.tv_PayRes) 
+	private TextView tvPayRes;
+	
+	@InjectView (R.id.tv_PayResTip) 
+	private TextView tvPayResTip;
+	
+	@InjectView (R.id.tv_DealNumber) 
+	private TextView tvDealNumber;
+	
+	@InjectView (R.id.tv_ICCardNum) 
+	private TextView tvICCardNum;
+	
+	@InjectView (R.id.tv_Amount) 
+	private TextView tvAmount;
+	
+	@InjectView (R.id.tv_RechargeObj) 
+	private TextView tvRechargeObj;
+	
+	@InjectView (R.id.tv_ResInstruction) 
+	private TextView tvResInstruction;
+	
+	@InjectView (R.id.btn_Confirm) 
+	private Button btnConfirm;
+	  
+	 
+	 
+	public static LApplication lApplication = LApplication.getInstance();
+	private SharedPreferenceUtil sharedPreferenceUtil;
+
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_iccardres);
+		initData(getIntent());
+		 
+		initView();
+		setListener();
+
+	}
+
+	 
+	public void initData(Intent intent) {
+		sharedPreferenceUtil = new SharedPreferenceUtil(ICCardResActivity.this);
+		
+		
+		cardNo = intent.getStringExtra("cardNo");
+		tradeNo = intent.getStringExtra("tradeNo");
+		
+		
+		
+ 
+		
+		 
+
+	}
+
+	public void initView() {
+
+		tvBack.setVisibility(View.VISIBLE);
+		tvTitle.setVisibility(View.VISIBLE);
+		tvTitle.setText(R.string.title_iccardres);
+		tvRight.setVisibility(View.VISIBLE); 
+		tvRight.setText("账单");
+		
+		tvPayRes.setText("");
+		tvPayResTip.setText("");
+		tvDealNumber.setText("");
+		tvICCardNum.setText("");
+		tvAmount.setText("");
+		tvResInstruction.setText("");
+		
+		BaseParser<ICDealDetailObject> icDealDetailParser = new ICDealDetailParser();
+		HashMap<String, String> requestDataMap = new HashMap<String, String>();
+		requestDataMap.put("tradeNo", tradeNo);
+		requestDataMap.put("cardNo", cardNo);
+		 
+		RequestObject vo = new RequestObject(R.string.url_icdealdetail,
+				ICCardResActivity.this, requestDataMap, icDealDetailParser);
+		getDataFromServer(vo, new DataCallback<ICDealDetailObject>() {
+			@Override
+			public void processData(ICDealDetailObject paramObject,
+					boolean paramBoolean) {
+				Drawable topDrawable;
+				 if(paramObject.getStatus().equalsIgnoreCase(Constant.STATUS_SUCCESS)){
+					 tvPayRes.setText("充值成功");
+					 tvPayRes.setTextColor(getResources().getColor(R.color.text_blue));
+					 topDrawable = getResources().getDrawable(R.drawable.pay_success); 
+					 topDrawable.setBounds(0, 0, topDrawable.getMinimumWidth(), topDrawable.getMinimumHeight());
+					 tvPayRes.setCompoundDrawables(null,topDrawable, null,  null);
+					 //tvPayResTip.setText(paramObject.getParName().concat("即可充值到账")); 
+					 tvPayResTip.setText("请稍后，充值金额将在1分钟内到账！");
+					 //
+					 
+				 }
+				 if(paramObject.getStatus().equalsIgnoreCase(Constant.STATUS_FAIL)){
+					 tvPayRes.setText("充值失败");
+					 tvPayRes.setTextColor(getResources().getColor(R.color.red));
+                     topDrawable = getResources().getDrawable(R.drawable.pay_fail); 
+					 topDrawable.setBounds(0, 0, topDrawable.getMinimumWidth(), topDrawable.getMinimumHeight());
+					 tvPayRes.setCompoundDrawables(null,topDrawable, null,  null);
+				 }
+				 if(paramObject.getStatus().equalsIgnoreCase(Constant.STATUS_TOPAY)){
+					 tvPayRes.setText("充值中...");
+					 tvPayRes.setTextColor(getResources().getColor(R.color.red));
+                     topDrawable = getResources().getDrawable(R.drawable.pay_topay); 
+					 topDrawable.setBounds(0, 0, topDrawable.getMinimumWidth(), topDrawable.getMinimumHeight());
+					 tvPayRes.setCompoundDrawables(null,topDrawable, null,  null);
+				 }
+				 tvDealNumber.setText(paramObject.getTradeNo());
+				 tvICCardNum.setText(paramObject.getCardNo());
+				 tvAmount.setText(paramObject.getParName());
+				 tvResInstruction.setText(paramObject.getInstruction());
+				 if(CommonUtil.trim(paramObject.getCardType()).equalsIgnoreCase(Constant.IC_TYPE_CARD))
+					 tvRechargeObj.setText("一卡通（卡）");
+				 else
+					 tvRechargeObj.setText("一卡通（手机）");
+
+			}
+
+			@Override
+			public void processError(ConnectErrorObject responseErrorVo) {
+				 
+				DisPlay("error", responseErrorVo.getErrInfo());
+
+			}
+		});
+		 
+
+	}
+
+	public void setListener() {
+		tvBack.setOnClickListener(this);
+		btnConfirm.setOnClickListener(this); 
+		tvRight.setOnClickListener(this);
+		
+		 
+
+	} 
+
+	@Override
+	public void onConfigurationChanged(Configuration config) {
+		super.onConfigurationChanged(config);
+		if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
+
+		}
+		if (config.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+
+		}
+	}
+
+	@Override
+	public void onClick(View v) {
+		// TODO Auto-generated method stub
+
+		switch (v.getId()) {
+		case R.id.tv_Back:
+			ICCardResActivity.this.finish();
+			break;
+		case R.id.btn_Confirm:
+			this.finish();
+			break;
+		case R.id.tv_Right:
+			this.openActivity(ICCardBillActivity.class);
+			break;
+
+		}
+	}
+
+	 
+}

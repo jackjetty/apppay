@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,minimum-scale=1.0,maximum-scale=1.0"/>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="format-detection" content="telephone=no">
+<style type="text/css">
+body{margin:0;padding:0;text-align:left;width:100%;scroll:hidden;overflow:hidden;position:absolute;height:100%;overflow:auto;}
+.tab {
+    height:auto;
+    width:100%;
+    border-bottom:1px #FBFBFF solid;
+    background-color:#00B2EE;
+    position:absolute;
+    margin:0px 0px 0;
+ }
+ .tit {   
+    text-shadow: 0 1px 0 rgba(255, 255, 255, .7), 0px 2px 0 rgba(0, 0, 0, .5);   
+    text-transform:uppercase;   
+    text-align:center;   
+    color:#FBFBFF;   
+    line-height:3em;   
+    margin:16px 0 20px 0;   
+    letter-spacing: 4px;   
+    font:normal 26px/1 Microsoft YaHei, sans-serif;   
+}
+.under{
+	border-bottom:1px #F0F0F0 solid;
+	height:auto;
+	width:94%;
+    padding:10px;
+	}
+img{
+		float: left;
+		background-color:#0080FF;
+		height:50px;
+		width:50px;
+		top:0px;
+		position:absolute;
+}
+.more{
+		padding: 5px;
+		background: #fff;
+		color: #333;
+		text-align:center;
+	    height:40px;
+	    line-height:40px;
+	    width:100%;
+	    border-bottom:1px #FBFBFF solid;
+	    background-color:#F5F5F5;
+	    position:absolute;
+	    margin:0px 0px 0;
+}
+</style>
+<script type="text/javascript" src="js/jquery-1.7.2.js"></script>
+<script type="text/javascript">
+var listIndex = 0;
+$(function(){
+	getData(1);
+}); 
+function getData(index){
+	var xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><mcp type=\"request\"><params><param id=\"PageIndex\" value=\""+index+"\"/></params></mcp>";
+	$.ajax({
+		url : "faq/get",
+		data : xml,
+		dataType : "text",
+		type : "post",
+		success : function(data) {
+			data = decodeURIComponent(data.replace(/\+/g, '%20'));
+			data = jQuery.parseJSON(data);
+				if(data.pageSize > index){
+					index ++;
+					$("#read-more").addClass("more"); 
+					$("#read-more").append("<a onclick='getData("+index+")'>查看更多</a>");
+				}else{
+					$("#read-more").removeClass("more");
+					$("#read-more").html("");
+				}
+				var rows = data.listFaq;
+				for(var i=0;i<rows.length;i++){
+					var question = $("<article dir=\"ltr\" style=\"text-align:left;\" onclick=\"disPlay('result"+listIndex+"')\" class=\"under\"></article>");
+					question.append(rows[i].Title);
+					var result = $("<article id=\"result"+listIndex+"\" dir=\"ltr\" style=\"display: none;background-color:#BEBEBE;\" class=\"under\"></article>")
+					result.append(rows[i].Content);
+					$("#show").append(question);
+					$("#show").append(result);
+					listIndex ++;
+				}
+		},
+		error : function(data) {
+			alert(data.respCode);
+		}
+
+	});
+}
+var lastID = "start";
+function disPlay(id){
+	var obj = document.getElementById(id);
+	if(obj.style.display==""){
+		obj.style.display="none";
+	}else{
+	    obj.style.display="";
+	}
+	if(lastID != "start" && lastID != id){
+		var obj2 = document.getElementById(lastID);
+			obj2.style.display="none";
+	}
+	lastID = id;
+}
+function goback(){
+	window.history.back();
+}
+</script>
+</head>
+<body>
+<div class="tab" style="height:50px;top:0px;position:absolute;"> 
+<section>
+<header style="width:100%; overflow:hidden;">
+<p><img src="images/gb.jpg" onclick="goback()"></p>
+<h1 class="tit">常见问题</h1> 
+</header>
+<div id="show">
+</div>
+
+<div id="read-more"></div>
+</section>
+</div>
+</body>
+</html>

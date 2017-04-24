@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:background="@color/main_bg_color" >
+   <include 
+        android:id="@+id/topTitle" 
+        layout="@layout/title_bar"  
+     /> 
+     <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:fadingEdge="none"
+        android:scrollbars="vertical" 
+        android:layout_below="@id/topTitle">
+        
+         <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:orientation="vertical" >
+          <LinearLayout  
+               android:gravity="center_vertical" 
+               android:background="@drawable/settings_mid" 
+               android:layout_marginTop="20.0dip"  
+               android:layout_width="fill_parent" 
+               android:layout_height="@dimen/row_height"  >
+		         
+		        <EditText 
+		             android:id="@+id/et_Password" 
+		             android:textSize="@dimen/textSize_normal" 
+		             android:textColorHint="@color/list_text_small_color"  
+		             android:drawableLeft="@drawable/login_icon_password"
+		             android:background="@null"
+		             android:layout_width="fill_parent" 
+		             android:layout_height="fill_parent" 
+		             android:layout_marginLeft="5.0dip" 
+		             android:drawablePadding="5dp" 
+		             android:inputType="textPassword"
+		             android:hint="请输入6-20位字母、数字组成新密码" /> 
+		  </LinearLayout>
+		  
+           
+           <LinearLayout  
+               android:gravity="center_vertical" 
+               android:background="@drawable/settings_bottom" 
+                
+               android:layout_width="fill_parent" 
+               android:layout_height="@dimen/row_height"  >
+		         
+		        <EditText 
+		             android:id="@+id/et_ConfirmPassword" 
+		             android:textSize="@dimen/textSize_normal" 
+		             android:textColorHint="@color/list_text_small_color"  
+		             android:drawableLeft="@drawable/login_icon_password"
+		             android:background="@null"
+		             android:layout_width="fill_parent" 
+		             android:layout_height="fill_parent" 
+		             android:layout_marginLeft="5.0dip" 
+		             android:drawablePadding="5dp" 
+		             android:inputType="textPassword"
+		             android:hint="请再次输入密码" /> 
+		  </LinearLayout>
+		  
+           
+           
+		  
+           
+           
+		  
+           
+            
+            
+           
+           <Button
+                android:id="@+id/btn_FindUpdatePW"
+                android:layout_width="fill_parent"
+                android:layout_height="50dip"
+                android:layout_marginLeft="8dip"
+                android:layout_marginRight="8dip"
+                android:layout_marginTop="30dip"
+                android:background="@drawable/btn_submit"
+                android:shadowColor="#7f000000"
+                android:shadowDx="0.0"
+                android:shadowDy="1.0"
+                android:shadowRadius="1.0"
+                android:text="修改密码"
+                android:textColor="#ffffff"
+                android:textSize="18sp" 
+                android:enabled="true"/>
+		   
+         </LinearLayout>
+    </ScrollView> 
+</RelativeLayout>

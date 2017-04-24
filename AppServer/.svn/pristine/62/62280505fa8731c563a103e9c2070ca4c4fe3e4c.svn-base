@@ -1,0 +1,387 @@
+﻿package com.rising.appserver;
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.net.URLDecoder;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.script.Invocable;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+
+import org.apache.commons.httpclient.Cookie;
+import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpException;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.NameValuePair;
+import org.apache.commons.httpclient.cookie.CookiePolicy;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.params.HttpClientParams;
+import org.apache.commons.httpclient.params.HttpMethodParams;
+
+import com.rising.appserver.common.CommonUtil;
+import com.rising.appserver.common.Constant;
+import com.rising.appserver.factory.HttpFactory;
+
+public class QPayService{
+	
+	public final static String USER_AGENT_H = "User-Agent";
+	public final static String USER_AGENT = "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.22 (KHTML, like Gecko) Chrome/25.0.1364.172 Safari/537.22";
+	public final static String UTF_8 = "UTF-8";
+
+	private HttpClient client;
+	private Cookie[] cookies;
+	private String cookiestr;
+	private String qqNumber;
+	private String qqPassword;
+	private Header[] headers;
+	private Pattern pattern;
+	private Matcher matcher;
+	private String login_sig; 
+	private String pt_verifysession_v1;
+	private String verifycode;
+	private String[] resultArr; 
+	private String token;
+	private String cookie_uin;
+	private String cookie_skey;
+	private HashMap<String ,String> rstMap; 
+	
+	
+	
+	public QPayService(String qqNumber, String qqPassword) {
+		this.qqNumber = qqNumber;
+		this.qqPassword = qqPassword;
+		HttpFactory http = HttpFactory.getInstance();
+		client = http.getClient();
+		HttpClientParams params = client.getParams();
+		params.setContentCharset("utf-8");
+		client.getParams().setCookiePolicy(CookiePolicy.BROWSER_COMPATIBILITY);
+		client.getParams().setParameter("http.protocol.single-cookie-header",
+				true); 
+		this.login_sig = ""; 
+	}
+	
+	
+	private    String hex_md5(String str) throws Exception {
+		String url = ""; 
+		ScriptEngineManager manager = new ScriptEngineManager();
+		ScriptEngine engine = manager.getEngineByName("javascript");
+		Reader in = new InputStreamReader(this.getClass().getResourceAsStream(
+				"/tencent.js"));
+		engine.eval(in);
+		if (engine instanceof Invocable) {
+			Invocable invoke = (Invocable) engine;
+			url = invoke.invokeFunction("hex_md5", str).toString();
+		} 
+		return url;
+
+	}
+	
+	private  String getQdPayUrl(String password, String salt, String pt_verifysession_v1, String verifycode, String login_sig) 
+					throws Exception{
+
+		String url = ""; 
+		ScriptEngineManager manager = new ScriptEngineManager();
+		ScriptEngine engine = manager.getEngineByName("javascript");
+		Reader in = new InputStreamReader(this.getClass().getResourceAsStream(
+				"/tencent.js"));
+		engine.eval(in);
+		if (engine instanceof Invocable) {
+			Invocable invoke = (Invocable) engine;
+			url = invoke.invokeFunction("getQdPayUrl", password, salt,
+					pt_verifysession_v1, verifycode, login_sig).toString();
+
+		} 
+		return url;
+
+	}
+	
+	public void ptqrshow() {
+
+		try {
+			GetMethod get = new GetMethod(
+					"http://ptlogin2.qq.com/ptqrshow?appid=11000101&e=2&l=M&s=4&d=72&v=4&t="
+							+ CommonUtil.getRandom());
+			get.setRequestHeader("Referer", "http://ptlogin2.qq.com");
+			get.setRequestHeader(USER_AGENT_H, USER_AGENT);
+			int status = client.executeMethod(get);
+			if (status == HttpStatus.SC_OK) { 
+				String result = get.getResponseBodyAsString(); 
+
+			}
+		} catch (Exception e) {
+
+			String info = "【登录失败】【发生异常：" + e.getMessage() + "】";
+			System.out.println(info);
+
+		}
+
+	}
+	
+	public void loadPage() {
+		StringBuffer urlBuffer = new StringBuffer("");
+		urlBuffer.append("http://ui.ptlogin2.qq.com/cgi-bin/login?appid=11000101&f_url=loginerroralert&link_target=top&ep=http%3A//pay.qq.com/cgi-bin/login/qqacctlogin.cgi&s_url=http%3A//pay.qq.com/&qlogin_jumpname=payjump&qlogin_param=url%3Dhttp%253A//pay.qq.com");
+		try {
+			GetMethod get = new GetMethod(urlBuffer.toString());
+			get.setRequestHeader("Referer", "http://ui.ptlogin2.qq.com");
+			get.setRequestHeader(USER_AGENT_H, USER_AGENT);
+			int status = client.executeMethod(get);
+			if (status == HttpStatus.SC_OK) {
+				String result = get.getResponseBodyAsString();
+				headers = get.getResponseHeaders();
+				this.cookies = client.getState().getCookies(); 
+				for (Cookie c : client.getState().getCookies()) {
+					if (c.getName().equalsIgnoreCase("pt_login_sig")) {
+						this.login_sig = CommonUtil.trim(c.getValue());
+					} 
+				} 
+			}
+		} catch (Exception e) { 
+			String info = "【登录失败】【发生异常：" + e.getMessage() + "】";
+			System.out.println(info);
+
+		}
+
+	}
+	
+	public void check() {
+		StringBuffer urlBuffer = new StringBuffer("");
+		urlBuffer.append("http://check.ptlogin2.qq.com/check?");
+		urlBuffer.append("regmaster=");
+		urlBuffer.append("&pt_tea=1");
+		urlBuffer.append("&pt_vcode=1");
+		urlBuffer.append("&uin=").append(this.qqNumber);
+		urlBuffer.append("&appid=11000101");
+		urlBuffer.append("&js_ver=10131");
+		urlBuffer.append("&js_type=1");
+		urlBuffer.append("&login_sig=").append(this.login_sig);
+		urlBuffer.append("&u1=http%3A%2F%2Fpay.qq.com%2F");
+		urlBuffer.append("&r=").append(CommonUtil.getRandom());
+
+		try {
+			GetMethod get = new GetMethod(urlBuffer.toString());
+			get.setRequestHeader("Referer", "http://check.ptlogin2.qq.com");
+			get.setRequestHeader(USER_AGENT_H, USER_AGENT);
+			int status = client.executeMethod(get);
+			if (status == HttpStatus.SC_OK) {
+				String result = get.getResponseBodyAsString(); 
+				Pattern cellPtn = Pattern.compile("^ptui_checkVC\\((.*?)\\);$");
+				Matcher matcher = cellPtn.matcher(result);
+				if (matcher.find()) {
+					result = CommonUtil.trim(matcher.group(1));
+				} 
+				result = result.replaceAll("'", "");
+				resultArr = result.split(",");
+				verifycode = CommonUtil.trim(resultArr[1]);
+				pt_verifysession_v1 = CommonUtil.trim(resultArr[3]); 
+			}
+
+		} catch (Exception e) {
+			// e.printStackTrace();
+			String info = "【登录失败】【发生异常：" + e.getMessage() + "】";
+			System.out.println(info);
+
+		}
+	}
+	
+	
+	 
+	
+	
+	
+	
+	
+	
+	
+	public void login() { 
+		try {
+			String url = this.getQdPayUrl(qqPassword, qqNumber, pt_verifysession_v1,
+					verifycode, login_sig);
+			GetMethod get = new GetMethod(url);
+			get.setRequestHeader("Referer", "http://ptlogin2.qq.com/");
+			get.setRequestHeader("User-Agent",
+					"Mozilla/5.0 (Windows NT 6.1; rv:32.0) Gecko/20100101 Firefox/32.0");
+		 
+			int status;
+			status = client.executeMethod(get);
+			if (status == HttpStatus.SC_OK) {
+				String text = get.getResponseBodyAsString(); 
+				System.out.println(text);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			String info = "【群发信息失败】" + e.getMessage();
+			System.err.println(info);
+
+		}
+
+	}
+	public void goPayHome() {
+		try {
+			String url = "http://pay.qq.com/";
+			GetMethod get = new GetMethod(url);
+			get.setRequestHeader("Referer", "http://pay.qq.com/");
+			get.setRequestHeader("User-Agent",
+					"Mozilla/5.0 (Windows NT 6.1; rv:32.0) Gecko/20100101 Firefox/32.0"); 
+			int status;
+			status = client.executeMethod(get);
+			if (status == HttpStatus.SC_OK) {
+				String text = get.getResponseBodyAsString(); 
+				for (Cookie c : client.getState().getCookies()) {
+					if (c.getName().equalsIgnoreCase("uin")) {
+						this.cookie_uin = CommonUtil.trim(c.getValue());
+					}
+					if (c.getName().equalsIgnoreCase("skey")) {
+						this.cookie_skey = CommonUtil.trim(c.getValue());
+					} 
+					//System.out.println(" "+c.getDomain() +" "+c.getName()+" "+c.getValue() );
+					//(String domain, String name, String value) 
+				} 
+				new Test(client.getState().getCookies());
+				//System.out.println(text);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			String info = "【群发信息失败】" + e.getMessage();
+			System.err.println(info);
+
+		}
+
+	}
+	
+	 //http://api.unipay.qq.com/cgi-bin/get_pay_info.fcg?amt=1000&service_code=XXZXYY&sck=5f5b1b38bb01b0f8d9980ddc2b91b929&cmd=buy&payType=2&rr=0.2399313139652176
+	public void get_pay_info(String serverCode) {
+		cookie_uin=CommonUtil.trim(cookie_uin);
+		cookie_skey=CommonUtil.trim(cookie_skey); 
+		try {
+			StringBuffer urlBuffer = new StringBuffer("");
+			urlBuffer.append("http://api.unipay.qq.com/cgi-bin/get_pay_info.fcg?");
+			urlBuffer.append("amt=1000");
+			urlBuffer.append("&service_code=").append(serverCode); 
+			urlBuffer.append("&sck=").append(hex_md5(cookie_uin+cookie_skey).toLowerCase() );
+			urlBuffer.append("&cmd=buy");
+			urlBuffer.append("&payType=2"); 
+			urlBuffer.append("&rr=").append(CommonUtil.getRandom());
+			
+			GetMethod get = new GetMethod(urlBuffer.toString());
+			get.setRequestHeader("Referer", "http://api.unipay.qq.com");
+			get.setRequestHeader(USER_AGENT_H, USER_AGENT);
+			int status = client.executeMethod(get);
+			if (status == HttpStatus.SC_OK) {
+				String result = get.getResponseBodyAsString();
+				pattern=Pattern.compile("^(.+)(\"token\" : \")(.+)(\",\"kj\")(.+)$");
+		    	matcher = pattern.matcher(result ); 
+				if(matcher.find()){  
+					this.token=CommonUtil.trim(matcher.group(3)) ;   
+				}   
+			}
+
+		} catch (Exception e) {
+			// e.printStackTrace();
+			String info = "【登录失败】【发生异常：" + e.getMessage() + "】";
+			System.out.println(info);
+
+		}
+	}
+	
+	
+	 
+	 
+	public void uniform_pay(String serverCode,String serverType,String userNum,String openMonth) {
+	  
+		try {
+			StringBuffer urlBuffer = new StringBuffer("");
+			urlBuffer.append("http://upayportal.qq.com/cgi-bin/uniform_pay.fcg?");
+			urlBuffer.append("pay_num=").append(this.qqNumber);
+			urlBuffer.append("&user_num=").append(userNum);
+			urlBuffer.append("&service_code=").append(serverCode); 
+			urlBuffer.append("&sck=").append(this.hex_md5(cookie_skey).toLowerCase() );
+			urlBuffer.append("&source=1");
+			urlBuffer.append("&serve=1");
+			urlBuffer.append("&req_source=1");
+			urlBuffer.append("&open_mode=2");
+			urlBuffer.append("&open_month=").append(openMonth);
+			urlBuffer.append("&if_callback=1"); 
+			urlBuffer.append("&callback_url=http%3A%2F%2Fpay.qq.com%2Fipay%2Fcallback.shtml");
+			urlBuffer.append("&aid4open=pay.").append(serverType).append("%7Crch%3Dqdqb%7C").append(this.token);
+			urlBuffer.append("&from=pay");
+			urlBuffer.append("&rr=").append(CommonUtil.getRandom());
+			urlBuffer.append("&pay_way=2");
+			urlBuffer.append("&vendor_type=4");
+			urlBuffer.append("&auto_pay=0");
+			GetMethod get = new GetMethod(urlBuffer.toString());
+			get.setRequestHeader("Referer", "http://upayportal.qq.com/");
+			get.setRequestHeader(USER_AGENT_H, USER_AGENT);
+			int status = client.executeMethod(get);
+			if (status == HttpStatus.SC_OK) {
+				String result = get.getResponseBodyAsString();
+				result=URLDecoder.decode(result,"utf-8") ;
+				result=URLDecoder.decode(result,"utf-8");
+				System.out.println("result:"+result);
+				pattern=Pattern.compile("^.+(\\?)(.+)(\";).*$");
+				matcher=pattern.matcher(result);  
+				if(matcher.find()){  
+					result=CommonUtil.trim(matcher.group(2));   
+				} 
+				rstMap = new HashMap<String, String>();
+				Pattern responsePtn = Pattern.compile("(&)"); 
+				String[] strs = responsePtn.split(result);  
+				Pattern cellPtn = Pattern.compile("^(.+)=(.*?)$");  
+				for (String cellRst:strs) { 
+					matcher = cellPtn.matcher(cellRst );  
+					if(matcher.find()){  
+						rstMap.put(CommonUtil.trim(matcher.group(1)) , CommonUtil.trim(matcher.group(2)));
+					     
+					}     
+				
+				} 
+				if(CommonUtil.trim(rstMap.get("result")).equalsIgnoreCase("0")){
+					System.out.println("充值成功！");
+				}else{
+					System.out.println("充值失败！"+rstMap.get("result_info"));
+				}
+				 
+
+			}
+
+		} catch (Exception e) {
+			// e.printStackTrace();
+			String info = "【登录失败】【发生异常：" + e.getMessage() + "】";
+			System.out.println(info);
+
+		}
+	}
+	
+	
+	
+ 
+
+	
+	public static void main(String[] args){
+		QPayService qPayService=new QPayService("494180070","15868453501");
+		qPayService.loadPage();
+		qPayService.check();
+		qPayService.login();
+		
+ 		qPayService.goPayHome() ;
+//		qPayService.get_pay_info(Constant.QQSERVICE_YELLOW);
+//		qPayService.uniform_pay(Constant.QQSERVICE_YELLOW,Constant.QQSERVICETYPE_YELLOW,"562587129","1");
+		
+		
+	}
+}

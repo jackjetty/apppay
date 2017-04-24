@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:background="@color/main_bg_color">
+   <include 
+        android:id="@+id/topTitle" 
+        layout="@layout/title_bar"  
+     />  
+   <com.ris.mobile.ecloud.widget.PullToRefreshLayout
+        android:id="@+id/refresh_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/topTitle" >
+
+        <include layout="@layout/allview_refresh_head" /> 
+
+        <com.ris.mobile.ecloud.widget.pullableview.PullableListView
+            android:id="@+id/lv_Employ"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+             
+            android:divider="@drawable/divider"
+             />
+
+        <include layout="@layout/allview_load_more" />
+    </com.ris.mobile.ecloud.widget.PullToRefreshLayout> 
+</RelativeLayout>

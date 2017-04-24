@@ -1,0 +1,365 @@
+<?xml version="1.0" encoding="utf-8"?>  
+<RelativeLayout  
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:attrs="http://schemas.android.com/apk/res/com.ris.mobile.express"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" 
+    android:background="@color/background" >   
+    <include 
+        android:id="@+id/topTitle" 
+        layout="@layout/title_bar"  
+    />  
+    <ScrollView 
+	        android:scrollbarThumbVertical="@drawable/scrollbar_handle_vertical" 
+	        android:focusableInTouchMode="true" 
+	        android:layout_width="fill_parent" 
+	        android:layout_height="fill_parent" 
+	        android:layout_below="@id/topTitle"
+	        android:background="@color/background" > 
+	        
+        
+        
+        
+	        
+    
+    
+    <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" 
+        android:orientation="vertical"
+          > 
+          
+        <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:background="@drawable/row_selector" >
+
+                <com.ris.mobile.ecloud.widget.CircularImage
+                    android:id="@+id/iv_Head"
+                    android:layout_width="65dp"
+                    android:layout_height="65dp"
+                    android:layout_margin="8dp"
+                    android:layout_centerVertical="true"
+                    android:src="@drawable/head_female" />
+                
+                <LinearLayout 
+			        android:layout_width="wrap_content"
+			        android:layout_height="wrap_content" 
+			        android:orientation="vertical"
+			        android:layout_toRightOf="@id/iv_Head" 
+			        android:layout_centerInParent="true"
+			        android:layout_marginLeft="12dip"
+			          > 
+			          
+                     <TextView
+                        android:id="@+id/tv_UserName"
+	                    style="@style/text_black_16"
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="match_parent"
+	                    android:layout_gravity="center_vertical" 
+	                    android:drawablePadding="6dp"
+	                    android:duplicateParentState="true"
+	                    android:gravity="center_vertical"
+	                    android:text="哎呀呀"/>
+                     
+                     
+                     <TextView
+                            android:id="@+id/tv_UserId"
+		                    android:textColor="@color/gray"
+		                    android:text="18757530227" 
+		                    android:layout_marginTop="10dip"
+		                    android:textSize="@dimen/textSize_normal" 
+		                    android:layout_width="wrap_content"
+		                    android:layout_height="wrap_content"
+		                    android:layout_centerVertical="true"  />
+			   </LinearLayout>
+                
+                
+         </RelativeLayout>       
+        <LinearLayout  
+               android:gravity="center_vertical"  
+               android:id="@+id/ll_Balance" 
+               android:layout_width="fill_parent" 
+               android:layout_height="@dimen/row_height"   
+               android:layout_marginTop="1.5px"
+               android:padding="10dip"
+               android:background="@color/white" >
+		         
+		        <TextView 
+		               style="@style/text_black_16"
+		               android:textColor="@color/key_gray"
+		               android:paddingLeft="5.0dip"
+		               android:layout_width="wrap_content" 
+		               android:layout_height="wrap_content" 
+		               android:text="一卡通余额" />
+		        
+		        <TextView 
+		            android:id="@+id/tv_Balance" 
+		            android:textSize="@dimen/textSize_normal" 
+		            android:textColor="#ffda1919" 
+		            android:background="@null" 
+		            android:layout_width="fill_parent" 
+		            android:layout_height="wrap_content" 
+		            android:layout_marginLeft="10.0dip" 
+		            android:gravity="right"  
+		            android:paddingRight="0dip"
+		            android:text="20.00元" 
+		            android:drawablePadding="12dp"
+		            android:drawableRight="@drawable/arrow_go" /> 
+		            
+		  </LinearLayout>
+                
+          <RelativeLayout
+                android:id="@+id/rl_Person"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/row_height"
+                android:layout_marginTop="@dimen/row_margin" 
+                android:background="@drawable/row_selector"
+                android:paddingLeft="@dimen/row_padding_left"
+                android:paddingRight="@dimen/row_padding_right" >
+
+                <TextView
+                    style="@style/text_black_16"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:drawableLeft="@drawable/ic_mine_person"
+                    android:drawablePadding="6dp"
+                    android:duplicateParentState="true"
+                    android:gravity="center_vertical"
+                    android:text="@string/text_mine_person"/>
+
+                <TextView
+                    android:textColor="@color/gray"
+                    android:text="" 
+                    android:textSize="@dimen/textSize_normal" 
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@+id/iv_ArrowPerson"
+                    android:paddingRight="@dimen/row_padding_right" />
+
+                <ImageView 
+                    android:id="@+id/iv_ArrowPerson"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentRight="true"
+                    android:duplicateParentState="true"
+                    android:gravity="center_vertical"
+                    android:src="@drawable/arrow_go" />
+            </RelativeLayout> 
+            
+          
+          <!--   <RelativeLayout
+                android:id="@+id/rl_Bind"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/row_height"
+                android:layout_marginTop="1.5px" 
+                android:background="@drawable/row_selector"
+                android:paddingLeft="@dimen/row_padding_left"
+                android:paddingRight="@dimen/row_padding_right" >
+
+                <TextView
+                    style="@style/text_black_16"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:drawableLeft="@drawable/ic_mine_bind"
+                    android:drawablePadding="6dp"
+                    android:duplicateParentState="true"
+                    android:gravity="center_vertical"
+                    android:text="@string/text_mine_bind"/>
+
+                <TextView
+                    android:textColor="@color/gray"
+                    android:text="" 
+                    android:textSize="@dimen/textSize_normal" 
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@+id/iv_ArrowBind"
+                    android:paddingRight="@dimen/row_padding_right" />
+
+                <ImageView 
+                    android:id="@+id/iv_ArrowBind"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentRight="true"
+                    android:duplicateParentState="true"
+                    android:gravity="center_vertical"
+                    android:src="@drawable/arrow_go" />
+            </RelativeLayout>  -->
+            
+           
+           <RelativeLayout
+                android:id="@+id/rl_Update"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/row_height"
+                android:layout_marginTop="1.5px" 
+                android:background="@drawable/row_selector"
+                android:paddingLeft="@dimen/row_padding_left"
+                android:paddingRight="@dimen/row_padding_right" >
+
+                <TextView
+                    style="@style/text_black_16"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:drawableLeft="@drawable/ic_mine_update"
+                    android:drawablePadding="6dp"
+                    android:duplicateParentState="true"
+                    android:gravity="center_vertical"
+                    android:text="@string/text_mine_update"/>
+
+                <TextView
+                    android:textColor="@color/gray"
+                    android:text="" 
+                    android:textSize="@dimen/textSize_normal" 
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@+id/iv_ArrowUpdate"
+                    android:paddingRight="@dimen/row_padding_right" />
+
+                <ImageView 
+                    android:id="@+id/iv_ArrowUpdate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentRight="true"
+                    android:duplicateParentState="true"
+                    android:gravity="center_vertical"
+                    android:src="@drawable/arrow_go" />
+            </RelativeLayout>  
+            
+           
+           
+           
+           <RelativeLayout
+                android:id="@+id/rl_Apply"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/row_height"
+                android:layout_marginTop="@dimen/row_margin" 
+                android:background="@drawable/row_selector"
+                android:paddingLeft="@dimen/row_padding_left"
+                android:paddingRight="@dimen/row_padding_right" >
+
+                <TextView
+                    style="@style/text_black_16"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:drawableLeft="@drawable/ic_mine_apply"
+                    android:drawablePadding="6dp"
+                    android:duplicateParentState="true"
+                    android:gravity="center_vertical"
+                    android:text="@string/text_mine_apply"/>
+
+                <TextView
+                    android:textColor="@color/gray"
+                    android:text="" 
+                    android:textSize="@dimen/textSize_normal" 
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@+id/iv_ArrowApply"
+                    android:paddingRight="@dimen/row_padding_right" />
+
+                <ImageView 
+                    android:id="@+id/iv_ArrowApply"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentRight="true"
+                    android:duplicateParentState="true"
+                    android:gravity="center_vertical"
+                    android:src="@drawable/arrow_go" />
+            </RelativeLayout> 
+            
+           <RelativeLayout
+                android:id="@+id/rl_ICCard"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/row_height"
+                android:layout_marginTop="1.5px" 
+                android:background="@drawable/row_selector"
+                android:paddingLeft="@dimen/row_padding_left"
+                android:paddingRight="@dimen/row_padding_right" >
+
+                <TextView
+                    style="@style/text_black_16"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:drawableLeft="@drawable/ic_mine_iccard"
+                    android:drawablePadding="6dp"
+                    android:duplicateParentState="true"
+                    android:gravity="center_vertical"
+                    android:text="@string/text_mine_iccard"/>
+
+                <TextView
+                    android:textColor="@color/gray"
+                    android:text="" 
+                    android:textSize="@dimen/textSize_normal" 
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@+id/iv_ArrowICCard"
+                    android:paddingRight="@dimen/row_padding_right" />
+
+                <ImageView 
+                    android:id="@+id/iv_ArrowICCard"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentRight="true"
+                    android:duplicateParentState="true"
+                    android:gravity="center_vertical"
+                    android:src="@drawable/arrow_go" />
+            </RelativeLayout>
+            
+           
+           <RelativeLayout
+                android:id="@+id/rl_FeedBack"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/row_height"
+                android:layout_marginTop="@dimen/row_margin" 
+                android:background="@drawable/row_selector"
+                android:paddingLeft="@dimen/row_padding_left"
+                android:paddingRight="@dimen/row_padding_right" >
+
+                <TextView
+                    style="@style/text_black_16"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:drawableLeft="@drawable/ic_mine_feedback"
+                    android:drawablePadding="6dp"
+                    android:duplicateParentState="true"
+                    android:gravity="center_vertical"
+                    android:text="@string/text_mine_feedback"/>
+
+                <TextView
+                    android:textColor="@color/gray"
+                    android:text="" 
+                    android:textSize="@dimen/textSize_normal" 
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@+id/iv_ArrowFeedBack"
+                    android:paddingRight="@dimen/row_padding_right" />
+
+                <ImageView 
+                    android:id="@+id/iv_ArrowFeedBack"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentRight="true"
+                    android:duplicateParentState="true"
+                    android:gravity="center_vertical"
+                    android:src="@drawable/arrow_go" />
+            </RelativeLayout> 
+            
+    </LinearLayout>
+    
+    
+    
+    
+    </ScrollView>
+      
+</RelativeLayout>

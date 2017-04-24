@@ -1,0 +1,70 @@
+package com.rising.appserver.action;
+import java.io.IOException; 
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.Date;
+import java.util.HashMap; 
+import java.util.Iterator;
+import java.util.Map; 
+import java.util.Random;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;  
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.dom4j.DocumentException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody; 
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
+import com.rising.appserver.bean.RespError;
+import com.rising.appserver.common.BaseAction;
+import com.rising.appserver.common.CommonUtil; 
+import com.alipay.config.*;
+import com.alipay.util.*;
+@Controller
+@RequestMapping("/qqReback")
+public class QQReback extends BaseAction{
+	
+	private Log log = LogFactory.getLog(QQReback.class);
+	private static final String notify_url = "http://115.239.134.175:80/AppServer/qqAgent/qqRefundNotice";
+	
+	
+	@RequestMapping(value="/qqRefund", produces = "text/html; charset=utf-8")
+	public @ResponseBody String qqRefund(HttpServletRequest request, HttpServletResponse response){  
+		String refund_date = CommonUtil.trim((request.getParameter("refund_date")));
+		String batch_no = CommonUtil.trim((request.getParameter("batch_no"))); 
+		String batch_num = CommonUtil.trim((request.getParameter("batch_num")));
+		String detail_data= CommonUtil.trim((request.getParameter("detail_data")));  
+		try {
+			detail_data = new String(request.getParameter("detail_data").getBytes("ISO-8859-1"),"UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}  
+		Map<String, String> sParaTemp = new HashMap<String, String>();
+		sParaTemp.put("service", "refund_fastpay_by_platform_pwd");
+        sParaTemp.put("partner", AlipayConfig.partner);
+        sParaTemp.put("_input_charset", AlipayConfig.input_charset);
+		sParaTemp.put("notify_url", notify_url);
+		sParaTemp.put("seller_email", AlipayConfig.seller);
+		sParaTemp.put("refund_date", refund_date);
+		sParaTemp.put("batch_no", batch_no);
+		sParaTemp.put("batch_num", batch_num);
+		sParaTemp.put("detail_data", detail_data);
+		
+		//建立请求
+		
+		
+		String sHtmlText = AlipaySubmit.buildRequest(sParaTemp,"get","确认"); 
+		 
+		//AlipayCore.logResult("refund",sHtmlText);
+		return sHtmlText;
+		 
+		
+	}
+}

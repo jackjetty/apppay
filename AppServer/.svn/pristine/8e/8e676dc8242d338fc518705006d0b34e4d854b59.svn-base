@@ -1,0 +1,283 @@
+package com.rising.appserver.common;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.dom4j.Attribute;
+import org.dom4j.Document;
+import org.dom4j.DocumentException;
+import org.dom4j.DocumentHelper;
+import org.dom4j.Element;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Controller;
+
+@Controller
+public class BaseAction {
+
+	private String RSAPublicKey;
+
+	private String RSAPrivateKey;
+
+	private String MD5Key;
+
+	public String getRSAPublicKey() {
+		return RSAPublicKey;
+	}
+
+	@Value("#{propertiesReader[RSAPublicKey]}")
+	public void setRSAPublicKey(String rSAPublicKey) {
+		RSAPublicKey = rSAPublicKey;
+	}
+
+	public String getRSAPrivateKey() {
+		return RSAPrivateKey;
+	}
+
+	@Value("#{propertiesReader[RSAPrivateKey]}")
+	public void setRSAPrivateKey(String rSAPrivateKey) {
+		RSAPrivateKey = rSAPrivateKey;
+	}
+
+	public String getMD5Key() {
+		return MD5Key;
+	}
+
+	@Value("#{propertiesReader[MD5Key]}")
+	public void setMD5Key(String mD5Key) {
+		MD5Key = mD5Key;
+	}
+
+	Log log = LogFactory.getLog(BaseAction.class);
+
+	public HashMap<String, String> getParameterFromRequest(
+			HttpServletRequest request) throws DocumentException, IOException {
+		HashMap<String, String> map = new HashMap<String, String>();
+		request.setCharacterEncoding("utf-8");
+		String userAgent = request.getHeader("user-agent");
+		if(userAgent.toLowerCase().contains("ios_c")){
+			
+			 
+			Map requestParams = request.getParameterMap();
+			for (Iterator iter = requestParams.keySet().iterator(); iter.hasNext();) {
+				String name = (String) iter.next();
+				String[] values = (String[]) requestParams.get(name);
+				String valueStr = "";
+				for (int i = 0; i < values.length; i++) {
+					valueStr = (i == values.length - 1) ? valueStr + values[i]
+							: valueStr + values[i] + ",";
+				} 
+				map.put(name, valueStr);
+				//paramBuffer.append(name).append("=").append(valueStr).append("$"); 
+			}
+			map.put("clientIp", HttpRequestDeviceUtils.getIpAddr(request));
+			return map;
+		}
+		String requestXML = getRequestXMLStringFromRequest(request);
+		
+		if(userAgent.toLowerCase().contains("ios")){
+			map = getParameterFromXML(decodeXMLString2(requestXML));
+		}else if(userAgent.toLowerCase().contains("android")){
+			map = getParameterFromXML(decodeXMLString(requestXML));
+		}
+		map.put("clientIp", HttpRequestDeviceUtils.getIpAddr(request));
+		return map;
+	}
+	public HashMap<String, String> getParameterFromRequest2(
+			HttpServletRequest request) throws DocumentException, IOException {
+		HashMap<String, String> map = new HashMap<String, String>();
+		map.put("ImgName", request.getParameter("ImgName"));
+		map.put("InforId", request.getParameter("InforId"));
+		map.put("Resoluation",request.getParameter("Resoluation"));
+		map.put("clientIp", HttpRequestDeviceUtils.getIpAddr(request));
+		return map;
+	}
+
+	public HashMap<String, String> getParameterFromXML(String requestXML)
+			throws DocumentException {
+		HashMap<String, String> map = new HashMap<String, String>();
+		Document d;
+		try {
+			d = DocumentHelper.parseText(requestXML);
+			Element root = d.getRootElement();
+			Element e = root.element("params");
+			Iterator<?> it = e.elementIterator("param");
+			while (it.hasNext()) {
+				Element e1 = (Element) it.next();
+				Iterator<?> it1 = e1.attributeIterator();
+				while (it1.hasNext()) {
+					Attribute a = (Attribute) it1.next();
+					Attribute b = (Attribute) it1.next();
+					map.put(a.getValue(), b.getValue());
+				}
+			}
+		} catch (DocumentException e) {
+			log.error("getParameterFromXML()->xml报文解析出错!" + e.toString());
+			throw e;
+		}
+		return map;
+	}
+
+	public String mapToString(HashMap<String, String> map) {
+		String parameter = "";
+		Set<String> set = map.keySet();
+		Iterator<String> it = set.iterator();
+		while (it.hasNext()) {
+			String key = it.next();
+			String value = map.get(key);
+			parameter = parameter + key + "=" + value + "&";
+		}
+		return parameter;
+	}
+
+	public String getRequestXMLStringFromRequest(HttpServletRequest request)
+			throws IOException {
+		BufferedReader br = null;
+		StringBuilder rs = new StringBuilder();
+		String line;
+		try {
+			br = request.getReader();
+			while ((line = br.readLine()) != null) {
+				rs.append(line);
+			}
+			br.close();
+		} catch (IOException e) {
+			log.error("getRequestXMLStringFromRequest()->获取xml请求报文出错！"
+					+ e.toString());
+			throw e;
+		}
+
+		return rs.toString();
+	}
+
+	public boolean CheckParameter(String[] parameterNames,
+			HashMap<String, String> map) {
+		for (int i = 0; i < parameterNames.length; i++) {
+			String value = map.get(parameterNames[i]);
+			//"".equals(value) ||
+			if ( value == null) {
+				return false;
+			} else
+				continue;
+		}
+		return true;
+	}
+	public void writerStr(String resultGson, HttpServletRequest request, HttpServletResponse response) {
+		 
+		try {
+			response.setCharacterEncoding("UTF-8");
+			response.getWriter().write(resultGson);
+			response.getWriter().close();
+		} catch (Exception e) {
+			log.error("writerGson()->输出返回数据时出错！");
+		}
+	}
+	public void writerGson(String GsonString, HttpServletRequest request, HttpServletResponse response) {
+		String userAgent = request.getHeader("user-agent");
+		String resultGson = "";
+		if(userAgent.toLowerCase().contains("ios")){
+			resultGson = encodeGsonString2(GsonString);
+		}else if(userAgent.toLowerCase().contains("android")){
+			resultGson = encodeGsonString(GsonString);
+		}else{
+			resultGson = GsonString;
+		}
+		try {
+			response.setCharacterEncoding("UTF-8");
+			response.getWriter().write(resultGson);
+			response.getWriter().close();
+		} catch (Exception e) {
+			log.error("writerGson()->输出返回数据时出错！");
+		}
+	}
+	
+	public String encodeUTF_8(String result){
+		try{
+			result=URLEncoder.encode(result, "UTF-8");
+		}catch(Exception ex){
+			
+		}
+		return result;
+	}
+
+	public void writerGson(String GsonString,  HttpServletResponse response) {
+		try {
+			response.setCharacterEncoding("UTF-8");
+			response.getWriter().write(GsonString);
+			response.getWriter().close();
+		} catch (Exception e) {
+			log.error("writerGson()->输出返回数据时出错！");
+		}
+	}
+	public String decodeXMLString(String xmlString) {
+		String plaintXMLString = null;
+		try {
+			String middleString = URLDecoder.decode(xmlString, "UTF-8");
+			byte[] middleByte = Base64Utils.decode(middleString);
+			plaintXMLString = new String(RSAUtils.decryptByPublicKey(
+					middleByte, RSAPublicKey));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return plaintXMLString;
+	}
+	
+	public String decodeXMLString2(String xmlString) {
+		String plaintXMLString = null;
+		String md5 = "";
+		try {
+			String middleString = URLDecoder.decode(xmlString, "UTF-8");
+			byte[] middleByte = Base64Utils.decode(middleString);
+			plaintXMLString = new String(middleByte);
+			md5 = plaintXMLString.split("&")[1].split("=")[1];
+			plaintXMLString = plaintXMLString.split("&")[0];
+			String newMd5 = MD5.encryptByMD5With16Bit(plaintXMLString+"&key="+MD5Key);
+			if (md5.equals(newMd5)) {
+				return plaintXMLString;
+			} else {
+				return null;
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return plaintXMLString;
+	}
+
+	public String encodeGsonString(String gsonString) {
+		String encodedString = "";
+		try {
+			byte[] middlebytes = RSAUtils.encryptByPrivateKey(
+					gsonString.getBytes(), RSAPrivateKey);
+			String middleString = Base64Utils.encode(middlebytes);
+			encodedString = URLEncoder.encode(middleString, "UTF-8");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return encodedString;
+	}
+
+	public String encodeGsonString2(String gsonString) {
+		String encodedString = "";
+		try {
+			String needMD5String = gsonString + "&key=" + MD5Key;
+			String MD5Value = MD5.encryptByMD5With16Bit(needMD5String);
+			String postString = gsonString + "&md5=" + MD5Value;
+			byte[] middlebytes = postString.getBytes();
+			String middleString = Base64Utils.encode(middlebytes);
+			encodedString = URLEncoder.encode(middleString, "UTF-8");
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return encodedString;
+	}
+}

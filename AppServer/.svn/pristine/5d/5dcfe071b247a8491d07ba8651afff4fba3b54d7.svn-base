@@ -1,0 +1,95 @@
+package com.rising.appserver;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.script.Invocable;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+import javax.servlet.http.Cookie; 
+
+import org.apache.commons.httpclient.Header;
+import org.apache.commons.httpclient.HttpClient; 
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.NameValuePair;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.params.HttpClientParams;
+
+import com.alipay.config.AlipayConfig;
+import com.alipay.util.AlipaySubmit;
+import com.rising.appserver.common.CommonUtil;
+import com.rising.appserver.factory.HttpFactory;
+ 
+ 
+public class Qzone{
+	
+	public final static String USER_AGENT_H = "User-Agent";
+	public final static String USER_AGENT = "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.22 (KHTML, like Gecko) Chrome/25.0.1364.172 Safari/537.22";
+	public final static String UTF_8 = "UTF-8"; 
+	
+	
+	
+ 
+
+	 
+ 
+	
+	 
+	public static void main(String args[]){
+		String notify_url = "http://115.239.134.175:80/AppServer/qqAgent/qqRefundNotice";
+		 
+		//需http://格式的完整路径，不允许加?id=123这类自定义参数
+
+		//卖家支付宝帐户
+		String seller_email =  "13336022050@189.cn";
+		//必填
+
+		//退款当天日期 
+		String refund_date = "2015-08-21 10:38:00";
+		//必填，格式：年[4位]-月[2位]-日[2位] 小时[2位 24小时制]:分[2位]:秒[2位]，如：2007-10-01 13:13:13
+
+		//批次号
+		String batch_no = "20150821103862";
+		//必填，格式：当天日期[8位]+序列号[3至24位]，如：201008010000001
+
+		//退款笔数
+		String batch_num ="1";
+		//必填，参数detail_data的值中，“#”字符出现的数量加1，最大支持1000笔（即“#”字符出现的数量999个）
+
+		//退款详细数据
+		String detail_data = "2015081900001000540062956297^0.01^充值失败";
+		//必填，具体格式请参见接口技术文档
+		
+		 
+		//////////////////////////////////////////////////////////////////////////////////
+		
+		//把请求参数打包成数组
+		Map<String, String> sParaTemp = new HashMap<String, String>();
+		sParaTemp.put("service", "refund_fastpay_by_platform_pwd");
+        sParaTemp.put("partner", AlipayConfig.partner);
+        sParaTemp.put("_input_charset", AlipayConfig.input_charset);
+		sParaTemp.put("notify_url", notify_url);
+		sParaTemp.put("seller_email", seller_email);
+		sParaTemp.put("refund_date", refund_date);
+		sParaTemp.put("batch_no", batch_no);
+		sParaTemp.put("batch_num", batch_num);
+		sParaTemp.put("detail_data", detail_data);
+		
+		//建立请求
+		
+		
+		String sHtmlText = AlipaySubmit.buildRequest(sParaTemp,"get","确认");
+		System.out.println(sHtmlText);
+	}
+}
+	

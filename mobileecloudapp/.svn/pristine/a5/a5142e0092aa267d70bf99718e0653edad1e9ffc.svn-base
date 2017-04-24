@@ -1,0 +1,441 @@
+package com.ris.mobile.ecloud.activity; 
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Vector;
+
+import com.bestpay.plugin.Plugin;
+import com.ris.mobile.ecloud.BaseActivity;
+import com.ris.mobile.ecloud.R;
+import com.ris.mobile.ecloud.LApplication;
+import com.ris.mobile.ecloud.BaseActivity.DataCallback;
+import com.ris.mobile.ecloud.log.CommonLog;
+import com.ris.mobile.ecloud.log.LogFactory; 
+import com.ris.mobile.ecloud.object.ApplySignObject;
+import com.ris.mobile.ecloud.object.ConnectErrorObject;
+ 
+import com.ris.mobile.ecloud.object.ApplyPayOrderObject;
+import com.ris.mobile.ecloud.object.ApplySignOrderObject;
+import com.ris.mobile.ecloud.object.ItemObject;
+import com.ris.mobile.ecloud.object.ParObject;
+import com.ris.mobile.ecloud.object.RequestObject;
+import com.ris.mobile.ecloud.object.ResponseObject;
+import com.ris.mobile.ecloud.parser.ApplyPayOrderParser;
+import com.ris.mobile.ecloud.parser.ApplySignOrderParser;
+import com.ris.mobile.ecloud.parser.ApplySignParser;
+import com.ris.mobile.ecloud.parser.BaseParser; 
+import com.ris.mobile.ecloud.parser.ResponseParser;
+import com.ris.mobile.ecloud.util.CommonUtil;
+import com.ris.mobile.ecloud.util.Constant;
+import com.ris.mobile.ecloud.util.NetUtil;
+import com.ris.mobile.ecloud.util.SharedPreferenceUtil;
+import com.ris.mobile.ecloud.widget.AlertDialog;
+import com.ris.mobile.ecloud.widget.ApplyPayPromptDialog;
+import com.ris.mobile.ecloud.widget.ApplySignPromptDialog;
+import com.ris.mobile.ecloud.widget.ParDialog;
+import com.ris.mobile.ecloud.widget.ParDialog.OnAddressCListener;
+
+import android.app.Activity;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Vibrator;
+import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.Html;
+import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.view.Gravity;
+import android.view.MotionEvent;
+import android.view.SurfaceHolder;
+import android.view.SurfaceHolder.Callback;
+import android.view.SurfaceView;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.MotionEvent;
+import android.view.View.OnTouchListener;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+public class ApplySignActivity extends BaseActivity implements OnClickListener  {
+
+	private static final String TAG = ApplySignActivity.class.getSimpleName();
+	private static final CommonLog log = LogFactory.createLog(TAG);
+	private TextView tvBack;
+	private TextView tvTitle;
+	private TextView tvRight;
+	
+	private String applyId;
+	private String applyType; 
+	private String tradeNo;
+	
+	private TextView tvApplyTitle; 
+	private TextView tvUserId;
+	private TextView tvUserName;
+	private TextView tvIDNum;
+	private TextView tvStudNo;
+	private TextView tvPhoneNumber;
+	
+	private RadioGroup rgUserSex;
+	private RadioButton rbMale;
+	private RadioButton rbFemale;
+	private TextView tvLabelOther1;
+	private EditText etValueOther1; 
+	private TextView tvLabelOther2;
+	private EditText etValueOther2;
+	private LinearLayout llOther1;
+	private LinearLayout llOther2;
+	private EditText etRemark;
+	private Button btnApply;
+	  
+	 
+	 
+	public static LApplication lApplication = LApplication.getInstance();
+	private SharedPreferenceUtil sharedPreferenceUtil;
+
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_applysign);
+		initData(getIntent());
+		findViewById();
+		initView();
+		setListener();
+
+	}
+
+	public void findViewById() {
+		tvBack = (TextView) findViewById(R.id.tv_Back);
+		tvTitle = (TextView) findViewById(R.id.tv_Title);
+		tvRight = (TextView) findViewById(R.id.tv_Right);
+
+		tvApplyTitle = (TextView) findViewById(R.id.tv_ApplyTitle); 
+		tvUserId = (TextView) findViewById(R.id.tv_UserId);
+		tvUserName = (TextView) findViewById(R.id.tv_UserName);
+		tvIDNum = (TextView) findViewById(R.id.tv_IDNum);
+		tvStudNo= (TextView) findViewById(R.id.tv_StudNo);
+		tvPhoneNumber = (TextView) findViewById(R.id.tv_PhoneNumber);
+		
+		rgUserSex = (RadioGroup) findViewById(R.id.rg_UserSex);
+		rbMale=(RadioButton) findViewById(R.id.rb_Male); 
+    	rbFemale=(RadioButton) findViewById(R.id.rb_Female); 
+    	llOther1 = (LinearLayout) findViewById(R.id.ll_Other1);
+		llOther2 = (LinearLayout) findViewById(R.id.ll_Other2);
+		tvLabelOther1 = (TextView) findViewById(R.id.tv_LabelOther1);
+		etValueOther1 = (EditText) findViewById(R.id.et_ValueOther1);
+		tvLabelOther2 = (TextView) findViewById(R.id.tv_LabelOther2);
+		etValueOther2 = (EditText) findViewById(R.id.et_ValueOther2);
+		etRemark = (EditText) findViewById(R.id.et_Remark);
+		 
+		btnApply = (Button) findViewById(R.id.btn_Apply);
+	}
+
+	public void initData(Intent intent) {
+		sharedPreferenceUtil = new SharedPreferenceUtil(ApplySignActivity.this); 
+		applyId = intent.getStringExtra("applyId");  
+		applyId=CommonUtil.trim(applyId); 
+		
+		applyType=CommonUtil.trim(intent.getStringExtra("applyType")); 
+		 
+		 
+
+	}
+
+	public void initView() {
+
+		tvBack.setVisibility(View.VISIBLE);
+		tvTitle.setVisibility(View.VISIBLE);
+		tvTitle.setText(R.string.title_applysign);
+		tvRight.setVisibility(View.INVISIBLE); 
+		
+		
+	 
+		
+		tvApplyTitle.setText(""); 
+		tvUserId.setText("");
+		tvUserName.setText("");
+		tvIDNum.setText("");
+		tvStudNo.setText("");
+		tvPhoneNumber.setText("");
+		tvLabelOther1.setText("");
+		etValueOther1.setText("");
+		tvLabelOther2.setText("");
+		etValueOther2.setText("");
+		etRemark.setText("");
+		btnApply.setVisibility(View.VISIBLE); 
+		 
+		
+		BaseParser<ApplySignObject> applySignParser = new ApplySignParser();
+		HashMap<String, String> requestDataMap = new HashMap<String, String>();
+		requestDataMap.put("userType", new Integer(sharedPreferenceUtil.getUserType()).toString() );
+		requestDataMap.put("applyId", applyId);
+		requestDataMap.put("applyType", applyType);
+		RequestObject vo = new RequestObject(R.string.url_applysign,
+				ApplySignActivity.this, requestDataMap, applySignParser);
+		 
+		getDataFromServer(vo, new DataCallback<ApplySignObject>() {
+			@Override
+			public void processData(ApplySignObject paramObject,
+					boolean paramBoolean) {
+				 
+				tvApplyTitle.setText(CommonUtil.trim(paramObject.getApplyTitle())); 
+				tvUserId.setText( sharedPreferenceUtil.getUserAccount());
+				tvUserName.setText(CommonUtil.trim(paramObject.getUserName()));
+				tvIDNum.setText(CommonUtil.trim(paramObject.getIdNum()));
+				tvStudNo.setText(CommonUtil.trim(paramObject.getStudNo()));
+				tvPhoneNumber.setText(CommonUtil.trim(paramObject.getMobile()));
+				
+				
+				
+				tvLabelOther1.setText(CommonUtil.trim(paramObject.getLabelOther1()));
+				tvLabelOther2.setText(CommonUtil.trim(paramObject.getLabelOther2()));
+				etValueOther1.setHint(CommonUtil.trim(paramObject.getHintOther1()));
+				etValueOther2.setHint(CommonUtil.trim(paramObject.getHintOther2()));
+				
+				if(CommonUtil.trim(paramObject.getLabelOther1()).equals("")){
+					tvLabelOther1.setVisibility(View.GONE);
+					etValueOther1.setVisibility(View.GONE);
+					llOther1.setVisibility(View.GONE);
+				}
+				if(CommonUtil.trim(paramObject.getLabelOther2()).equals("")){
+					tvLabelOther2.setVisibility(View.GONE);
+					etValueOther2.setVisibility(View.GONE);
+					llOther2.setVisibility(View.GONE);
+				}
+				
+				etRemark.setHint(CommonUtil.trim(paramObject.getRemark()));
+				String sex= CommonUtil.trim(paramObject.getSex()) ;
+				if(sex.equalsIgnoreCase("女")){
+					rbFemale.setChecked(true);
+					rbMale.setChecked(false);
+				}else{
+					rbMale.setChecked(true);
+					rbFemale.setChecked(false);
+				}
+				 
+				 
+				  
+
+			}
+
+			@Override
+			public void processError(ConnectErrorObject responseErrorVo) {
+				 
+				DisPlay("error", responseErrorVo.getErrInfo());
+
+			}
+		});
+		 
+
+	}
+
+	public void setListener() {
+		tvBack.setOnClickListener(this);
+		btnApply.setOnClickListener(this); 
+		tvRight.setOnClickListener(this);
+	} 
+
+	@Override
+	public void onConfigurationChanged(Configuration config) {
+		super.onConfigurationChanged(config);
+		if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
+			
+		}
+		if (config.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+
+		}
+	}
+
+	@Override
+	public void onClick(View v) {
+		// TODO Auto-generated method stub
+
+		switch (v.getId()) {
+		case R.id.tv_Back:
+			this.finish();
+			break;
+		case R.id.btn_Apply:
+			//下单
+			String applyTitle = CommonUtil.trim(tvApplyTitle.getText().toString());  
+			String userId = CommonUtil.trim(tvUserId.getText().toString()); 
+			String userName = CommonUtil.trim(tvUserName.getText().toString()); 
+			String idNum = CommonUtil.trim(tvIDNum.getText().toString()); 
+			String phoneNumber = CommonUtil.trim(tvPhoneNumber.getText().toString()); 
+			 
+			String labelOther1 = CommonUtil.trim(tvLabelOther1.getText().toString()); 
+			String valueOther1 = CommonUtil.trim(etValueOther1.getText().toString());
+			if(llOther1.getVisibility()==View.VISIBLE){
+				
+				if (valueOther1.equals("")) {
+					 DisPlay("error","请输入"+labelOther1);
+					 etValueOther1.requestFocus();
+					 return;
+				}
+			}
+			String labelOther2= CommonUtil.trim(tvLabelOther2.getText().toString()); 
+			String valueOther2 = CommonUtil.trim(etValueOther2.getText().toString());
+			if(llOther2.getVisibility()==View.VISIBLE){
+				
+				if (valueOther2.equals("")) {
+					 DisPlay("error","请输入"+labelOther2);
+					 etValueOther2.requestFocus();
+					 return;
+				}
+			}
+			String remark=CommonUtil.trim(etRemark.getText());
+			ApplySignPromptDialog dialog = new com.ris.mobile.ecloud.widget.ApplySignPromptDialog.Builder (ApplySignActivity.this)
+			.setTitle("报名确认")
+			.setApplyTitle(applyTitle)
+			.setApplyAmount("")
+			.setUserId(userId)
+			.setUserName(userName)
+			.setIDNum(idNum)
+			.setPhoneNumber(phoneNumber)
+			.setLabelOther1(labelOther1)
+			.setValueOther1(valueOther1)
+			.setLabelOther2(labelOther2)
+			.setValueOther2(valueOther2)
+			.setRemark(remark)
+			.setButton1("取消", new ApplySignPromptDialog.OnClickListener() {
+				@Override
+				public void onClick(Dialog dialog, int which) { 
+					dialog.dismiss();
+				}
+			})
+			.setButton2("确认", new ApplySignPromptDialog.OnClickListener() {
+				@Override
+				public void onClick(Dialog dialog, int which) { 
+					goPay(); 
+					dialog.dismiss();
+					
+				}
+			}).show(); 
+			break;
+		
+
+		}
+	}
+	
+	private void goPay(){ 
+		String hintOther1=CommonUtil.trim(etValueOther1.getText());
+		String hintOther2=CommonUtil.trim(etValueOther2.getText());
+		String remark=CommonUtil.trim(etRemark.getText());
+		HashMap<String, String> requestDataMap = new HashMap<String, String>();
+		requestDataMap.put("applyId", applyId);
+		requestDataMap.put("hintOther1", hintOther1);
+		requestDataMap.put("hintOther2", hintOther2);
+		requestDataMap.put("remark", remark);
+		requestDataMap.put("userId", sharedPreferenceUtil.getUserId() );
+		
+		if(rbMale.isChecked()){
+			requestDataMap.put("sex", "男");
+		}else{
+			requestDataMap.put("sex", "女");
+		}
+		  
+		 
+		 
+		 
+ 
+		 
+
+
+
+
+
+		BaseParser<ApplySignOrderObject> applySignOrderParser = new ApplySignOrderParser();
+
+		RequestObject vo = new RequestObject(R.string.url_applysignorder,
+				ApplySignActivity.this, requestDataMap, applySignOrderParser);
+		getDataFromServer(vo, new DataCallback<ApplySignOrderObject>() {
+			@Override
+			public void processData(ApplySignOrderObject paramObject,
+					boolean paramBoolean) {
+				
+			 
+				 Bundle myBundel=new Bundle(); 
+				 myBundel.putString("tradeNo", CommonUtil.trim(paramObject.getDealNumber())); 
+				 openActivity(ApplySignResActivity.class,myBundel);
+				 ApplySignActivity.this.finish();
+				 //myBundel.putString("cardNo",CommonUtil.trim(etICCardNum.getText().toString())); 
+				
+				 
+				
+			}
+
+			@Override
+			public void processError(ConnectErrorObject responseErrorVo) {
+				 
+				DisPlay("error", responseErrorVo.getErrInfo());
+
+			}
+		});
+		
+		
+		
+		
+		        
+
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+		super.onActivityResult(requestCode, resultCode, data);
+		if (data != null) {
+			/**
+			 * 获取返回结果，以data中result数据为准
+			 */
+			 
+			if(resultCode==Constant.RESULT_OK){
+
+				 return;
+			}
+				
+				
+			String resMsg = data.getStringExtra("result");
+			
+			
+			AlertDialog dialog = new AlertDialog(this)
+			.builder()
+			.setTitle("支付结果")
+			.setMsg(resMsg) 
+			.setPositiveButton("确定", new OnClickListener() {
+				@Override
+				public void onClick(View v) {
+					 
+				}
+			});
+			dialog.show();
+			 
+		}
+	}
+
+	 
+}

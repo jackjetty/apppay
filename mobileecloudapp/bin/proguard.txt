@@ -1,0 +1,175 @@
+# view res/layout/activity_guide.xml #generated:13
+-keep class android.support.v4.view.PagerTitleStrip { <init>(...); }
+
+# view res/layout/activity_announce.xml #generated:43
+# view res/layout/activity_category.xml #generated:43
+# view res/layout/activity_guide.xml #generated:8
+-keep class android.support.v4.view.ViewPager { <init>(...); }
+
+# view res/layout/pull_loadmore_layout.xml #generated:2
+-keep class android.support.v4.widget.SwipeRefreshLayout { <init>(...); }
+
+# view res/layout/pull_loadmore_layout.xml #generated:13
+-keep class android.support.v7.widget.RecyclerView { <init>(...); }
+
+# view AndroidManifest.xml #generated:323
+-keep class com.bestpay.app.H5PayActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:40
+-keep class com.ris.mobile.ecloud.LApplication { <init>(...); }
+
+# view AndroidManifest.xml #generated:56
+-keep class com.ris.mobile.ecloud.activity.AboutActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:80
+-keep class com.ris.mobile.ecloud.activity.ApplyActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:89
+-keep class com.ris.mobile.ecloud.activity.ApplyBillActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:96
+-keep class com.ris.mobile.ecloud.activity.ApplyIntroduceActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:103
+-keep class com.ris.mobile.ecloud.activity.ApplyPayActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:110
+-keep class com.ris.mobile.ecloud.activity.ApplyPayRedActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:117
+-keep class com.ris.mobile.ecloud.activity.ApplyPayResActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:145
+-keep class com.ris.mobile.ecloud.activity.ApplySPActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:152
+-keep class com.ris.mobile.ecloud.activity.ApplySPRedActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:159
+-keep class com.ris.mobile.ecloud.activity.ApplySPResActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:124
+-keep class com.ris.mobile.ecloud.activity.ApplySignActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:131
+-keep class com.ris.mobile.ecloud.activity.ApplySignRedActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:138
+-keep class com.ris.mobile.ecloud.activity.ApplySignResActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:166
+-keep class com.ris.mobile.ecloud.activity.BindPhoneNumberActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:72
+-keep class com.ris.mobile.ecloud.activity.CategoryActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:316
+-keep class com.ris.mobile.ecloud.activity.CropImageActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:176
+-keep class com.ris.mobile.ecloud.activity.FAQActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:184
+-keep class com.ris.mobile.ecloud.activity.FeedBackActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:192
+-keep class com.ris.mobile.ecloud.activity.FindPasswordActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:200
+-keep class com.ris.mobile.ecloud.activity.FindUpdatePasswordActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:301
+-keep class com.ris.mobile.ecloud.activity.GetPicActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:210
+-keep class com.ris.mobile.ecloud.activity.GuideActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:218
+-keep class com.ris.mobile.ecloud.activity.ICCardActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:225
+-keep class com.ris.mobile.ecloud.activity.ICCardBillActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:242
+-keep class com.ris.mobile.ecloud.activity.ICCardResActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:308
+-keep class com.ris.mobile.ecloud.activity.ImageGridActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:45
+-keep class com.ris.mobile.ecloud.activity.LaunchActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:250
+-keep class com.ris.mobile.ecloud.activity.LoginActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:63
+-keep class com.ris.mobile.ecloud.activity.MainActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:260
+-keep class com.ris.mobile.ecloud.activity.PersonActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:269
+-keep class com.ris.mobile.ecloud.activity.RecruitActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:277
+-keep class com.ris.mobile.ecloud.activity.RegisterActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:232
+-keep class com.ris.mobile.ecloud.activity.TestBillActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:285
+-keep class com.ris.mobile.ecloud.activity.UpdatePasswordActivity { <init>(...); }
+
+# view AndroidManifest.xml #generated:293
+-keep class com.ris.mobile.ecloud.activity.WebViewActivity { <init>(...); }
+
+# view res/layout/fragment_mine.xml #generated:37
+-keep class com.ris.mobile.ecloud.widget.CircularImage { <init>(...); }
+
+# view res/layout/activity_announce.xml #generated:21
+# view res/layout/activity_category.xml #generated:21
+-keep class com.ris.mobile.ecloud.widget.ColumnHorizontalScrollView { <init>(...); }
+
+# view res/layout/activity_login.xml #generated:35
+# view res/layout/activity_login.xml #generated:51
+-keep class com.ris.mobile.ecloud.widget.DelEditText { <init>(...); }
+
+# view res/layout/common_dialog_generic.xml #generated:34
+# view res/layout/common_dialog_generic.xml #generated:79
+-keep class com.ris.mobile.ecloud.widget.HandyTextView { <init>(...); }
+
+# view res/layout/fragment_home.xml #generated:21
+-keep class com.ris.mobile.ecloud.widget.MyGallery { <init>(...); }
+
+# view res/layout/activity_testbill.xml #generated:12
+-keep class com.ris.mobile.ecloud.widget.PullLoadMoreRecyclerView { <init>(...); }
+
+# view res/layout/activity_apply.xml #generated:9
+# view res/layout/activity_applybill.xml #generated:9
+# view res/layout/activity_employ.xml #generated:9
+# view res/layout/activity_faq.xml #generated:11
+# view res/layout/activity_iccardbill.xml #generated:9
+# view res/layout/activity_new.xml #generated:9
+# view res/layout/fragment_article.xml #generated:5
+-keep class com.ris.mobile.ecloud.widget.PullToRefreshLayout { <init>(...); }
+
+# view res/layout/activity_main.xml #generated:13
+-keep class com.ris.mobile.ecloud.widget.TabView { <init>(...); }
+
+# view res/layout/crop_image.xml #generated:14
+-keep class com.ris.mobile.ecloud.widget.cropimage.CropImageView { <init>(...); }
+
+# view res/layout/activity_faq.xml #generated:20
+-keep class com.ris.mobile.ecloud.widget.pullableview.PullableExpandableListView { <init>(...); }
+
+# view res/layout/activity_apply.xml #generated:18
+# view res/layout/activity_applybill.xml #generated:18
+# view res/layout/activity_employ.xml #generated:17
+# view res/layout/activity_iccardbill.xml #generated:18
+# view res/layout/activity_new.xml #generated:17
+# view res/layout/fragment_article.xml #generated:12
+-keep class com.ris.mobile.ecloud.widget.pullableview.PullableListView { <init>(...); }
+
+# view res/layout/dialog_par.xml #generated:38
+-keep class com.ris.mobile.ecloud.widget.wheel.WheelView { <init>(...); }
+

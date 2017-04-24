@@ -1,0 +1,147 @@
+package com.rising.appserver;
+
+import java.security.Security;
+
+import com.sun.org.apache.xerces.internal.impl.dv.util.Base64;
+
+import javax.crypto.Cipher;
+import javax.crypto.SecretKey;
+import javax.crypto.spec.SecretKeySpec; 
+
+import org.apache.commons.codec.digest.DigestUtils;
+ 
+
+/*字符串 DESede(3DES) 加密 
+ * ECB模式/使用PKCS7方式填充不足位,目前给的密钥是192位 
+ * 3DES（即Triple DES）是DES向AES过渡的加密算法（1999年，NIST将3-DES指定为过渡的 
+ * 加密标准），是DES的一个更安全的变形。它以DES为基本模块，通过组合分组方法设计出分组加 
+ * 密算法，其具体实现如下：设Ek()和Dk()代表DES算法的加密和解密过程，K代表DES算法使用的 
+ * 密钥，P代表明文，C代表密表，这样， 
+ * 3DES加密过程为：C=Ek3(Dk2(Ek1(P))) 
+ * 3DES解密过程为：P=Dk1((EK2(Dk3(C))) 
+ * */
+public class ThreeDes {
+
+	/**
+	 * @param args在java中调用sun公司提供的3DES加密解密算法时
+	 *            ，需要使 用到$JAVA_HOME/jre/lib/目录下如下的4个jar包： jce.jar
+	 *            security/US_export_policy.jar security/local_policy.jar
+	 *            ext/sunjce_provider.jar
+	 */
+
+	private static final String Algorithm = "DESede"; // 定义加密算法,可用
+														// DES,DESede,Blowfish
+
+	// keybyte为加密密钥，长度为24字节
+	// src为被加密的数据缓冲区（源）
+	public static byte[] encryptMode(byte[] keybyte, byte[] src) {
+		try {
+			// 生成密钥
+			SecretKey deskey = new SecretKeySpec(keybyte, Algorithm);
+			// 加密
+			Cipher c1 = Cipher.getInstance(Algorithm);
+			c1.init(Cipher.ENCRYPT_MODE, deskey);
+			return c1.doFinal(src);// 在单一方面的加密或解密
+		} catch (java.security.NoSuchAlgorithmException e1) {
+			// TODO: handle exception
+			e1.printStackTrace();
+		} catch (javax.crypto.NoSuchPaddingException e2) {
+			e2.printStackTrace();
+		} catch (java.lang.Exception e3) {
+			e3.printStackTrace();
+		}
+		return null;
+	}
+
+	// keybyte为加密密钥，长度为24字节
+	// src为加密后的缓冲区
+	public static byte[] decryptMode(byte[] keybyte, byte[] src) {
+		try {
+			// 生成密钥
+			SecretKey deskey = new SecretKeySpec(keybyte, Algorithm);
+			// 解密
+			Cipher c1 = Cipher.getInstance(Algorithm);
+			c1.init(Cipher.DECRYPT_MODE, deskey);
+			return c1.doFinal(src);
+		} catch (java.security.NoSuchAlgorithmException e1) {
+			// TODO: handle exception
+			e1.printStackTrace();
+		} catch (javax.crypto.NoSuchPaddingException e2) {
+			e2.printStackTrace();
+		} catch (java.lang.Exception e3) {
+			e3.printStackTrace();
+		}
+		return null;
+	}
+
+	// 转换成十六进制字符串
+	public static String byte2Hex(byte[] b) {
+		String hs = "";
+		String stmp = "";
+		for (int n = 0; n < b.length; n++) {
+			stmp = (java.lang.Integer.toHexString(b[n] & 0XFF));
+			if (stmp.length() == 1) {
+				hs = hs + "0" + stmp;
+			} else {
+				hs = hs + stmp;
+			}
+			if (n < b.length - 1)
+				hs = hs + ":";
+		}
+		return hs.toUpperCase();
+	}
+
+	public static byte[] hex(String username) {
+		 
+		 
+		String f = DigestUtils.md5Hex(username );
+		System.out.println(f);
+		byte[] bkeys = new String(f).getBytes();
+		byte[] enk = new byte[24];
+		for (int i = 0; i < 24; i++) {
+			enk[i] = bkeys[i];
+		}
+		return enk;
+
+	}
+	public static char byteToChar(byte[] b) {
+        char c = (char) (((b[0] & 0xFF) << 8) | (b[1] & 0xFF));
+        return c;
+    }
+	public static void main(String[] args) {
+		byte[] enk = hex("BESTPAYQCOIN");// 用户名
+		//Security.addProvider(new com.sun.crypto.provider.SunJCE());
+		String password = "123456";// 密码
+		System.out.println("加密前123的字符串:" + password);
+		byte[] encoded = encryptMode(enk, password.getBytes());
+		System.out.println(encoded.length);
+		
+		int len=encoded.length;
+		char [] arr=new char[len];
+
+		for(int i=0; i<len; i++){
+		arr[i] = (char)encoded[i];
+		System.out.println(arr[i]);
+
+		} 
+	    
+		
+		
+		String pword = Base64.encode(encoded);
+		System.out.println("加密后的字符串:" + pword);
+		 pword="4ljPBKxsvmOu3XcbotYJNOn9Z0Zo1K2RNG0oqPYYR0mdBW1SD/tpVQgm5WSBpPI4HwyJRe4cQg0Y5sJU5s/9MtPsTYP5CEzioyvvF/i0622NHHiFbWf3wDmOF9lC+KnJBvUPfQrU0I0MaxLX00IxWLkHYBgU42Zbx4aLOUP0VauOe3u2wV0ix7gtvBq1xafRAKDxeMZiMRANsmIFOH6sB4u5YNWTgpw+SmIBcmaAcM2LV1CtBSoM7RIJlews8DwPO+oGBqcLum4R5MekV81iARK7wbUV+bQh6hq055+YqNzk3YqhkQO01wIsgBJFhUJYVvNhFzCaMPamldYTp+LBRKGUYM+G+QeyzRNClDR+mRJcXT4gBPxOFc/L8Q/JhjUfSJZtRAtAZRmmMYLX5OzB+mvDwlCgrzKe/elVdFoQoOfqqzl7baFrzvVbbPFO5gDXECh39AO9YDIw7FSapTOqDPHz8r7hu1betD9nQXLv4l0r6lyEF5cdv37t8Fj2eBhsO48N3l3v+zUO04jfQWIKli2xvl/7FYpb0Fbc/LrqlyB8+nfaebl0jA==";
+		 byte[] reqPassword = Base64.decode(pword);
+		byte[] srcBytes = decryptMode(enk, reqPassword);
+		System.out.println("解密后的字符串:" + (new String(srcBytes)));
+	 
+		/*RHlbvJAiH7Qiv74SaKbP1SK/vhJops/VIr++Emimz9XNdVEVq0KrQg==
+		 * pword=
+		 * "429EEA6B13B1CAAC95606E227BA295886D7B650488F0474CE7102C7FF25DCF57CB76283BFE7E6D1E78A17BC8B5A28B1858DF3ECFDDC9B4F932F1683753715B9881341842AE884DE9F70A08431C6EDB07A543C86D040B5B888C23A4C5669A303FA3B72522AD154CAA21FD63322DCB08E77602FB235AD36979EDB8085119ABCE018FACCE67632E6C2331A60824C36E2F5A658CBEFECBDB0C4D0E9B8378DCA571902D561103226C13AD31A60824C36E2F5A6B8A5AA6D4242FF6EDB8085119ABCE01C8D71680B4DFC2D1A0EB9D5E169EE537B0F7502AB39859C3E97A1A53DF5DFA90D70A204A294755EDDCCFAD430302AE86A6B8C21D571BECF03DEAEB8133A1B306D811F1A537FEF85BEB687586A9F88FF47B088AAE2247DC520AF1EA3E138F9B6478068E2115C834DCE4ACD39FAB0352924B33482625FE0707ABE3A68B53FC2806C9D71F3154743331D41F725D3B13035A8C89CDF0392B185B4B19D253667CB3B01BCD9BC731E4DB2EBD8E20C15BD57482862730793FADC010DA9BFC41F1FB770BC27DFAC29D0A43AEA701CD43A6B519B50AF00DCB68C37DDC046F66EE8DFB5568"
+		 * ; reqPassword = Base64.decode(pword); srcBytes =
+		 * decryptMode(enk,reqPassword); System.out.println("解密后的字符串:" + (new
+		 * String(srcBytes)));
+		 */
+
+		// System.out.println(enk.length);
+	}
+}

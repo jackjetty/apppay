@@ -1,0 +1,243 @@
+package com.rising.web.service.impl;
+
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.PrintWriter;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+
+import org.apache.commons.codec.digest.DigestUtils;
+import org.jdom.JDOMException;
+
+import com.alipay.util.AlipayCore;
+import com.google.gson.Gson;
+import com.rising.appserver.common.CommonUtil;
+import com.rising.appserver.common.Constant;
+import com.rising.appserver.common.DESUtil;
+import com.rising.appserver.common.XmlUtil;
+import com.rising.web.service.IHBpayService;
+
+public class HBpayService implements IHBpayService {
+	
+	//accessVoucher: FAC6F9F1F06D414A7F1D7D2EE628
+	//sign: 
+	//  
+	public String rechargeQQ(String accessVoucher ,String parasXml){
+		HashMap<String,Object> result = new HashMap<String,Object>(); 
+		Date curDate=new Date(); 
+		
+		StringBuffer paramBuffer=new StringBuffer("");
+		paramBuffer.append(" rechargeQQ ");
+		paramBuffer.append(CommonUtil.doDateForm(curDate, "yyyy-MM-dd HH:mm:ss"));
+		paramBuffer.append( "   "+accessVoucher);
+		paramBuffer.append( "   "+parasXml);
+		CommonUtil.appendLog("webservice",paramBuffer.toString());
+		accessVoucher=CommonUtil.trim(accessVoucher);
+		parasXml= DESUtil.decryptMode(Constant.DESKEY_BESTPAY, parasXml) ;
+		String resultGson;
+		Gson gson=new Gson() ; 
+		if(!accessVoucher.equalsIgnoreCase(Constant.ACCESSVOUCHER_BESTPAY)){
+			result.put("respCode",11);
+			result.put("respInfo", "用户凭证不正确，请查证！");
+			resultGson = gson .toJson(result);
+			return encodeUTF_8(resultGson); 
+		}
+		
+		if(parasXml.equalsIgnoreCase("")){
+			result.put("respCode",12);
+			result.put("respInfo", "传输的数据有误，解密不成功!");
+			resultGson = gson.toJson(result);
+			return encodeUTF_8(resultGson); 
+		}
+		
+		/*
+		 * <?xml version="1.0" encoding="utf-8" standalone="no"?>
+<ROOT FuncName="rechargeQQ">
+  <paymentNumber>1231</paymentNumber>
+  <phoneNumber>123123</phoneNumber>
+  <qqNumber>12123</qqNumber>
+  <productId>16019</productId>
+  <paymoney>0.10</paymoney>
+  <srcsysid>bestpay</srcsysid>
+  <inputtime>20150821103713</inputtime>
+  <clientip>127.0.0.1</clientip>
+  <sign>e4d94752e0724d64b1a487feac127a1a</sign>
+</ROOT>
+		 */
+		
+		
+		
+		Map<String, String> map=new HashMap<String,String>();
+		try {
+			map = XmlUtil.xml2Map(parasXml);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+		}
+		String paymentNumber=CommonUtil.trim(map.get("ROOT.paymentNumber"));
+		String phoneNumber=CommonUtil.trim(map.get("ROOT.phoneNumber"));
+		String qqNumber=CommonUtil.trim(map.get("ROOT.qqNumber")); 
+		String productId=CommonUtil.trim(map.get("ROOT.productId"));
+		String paymoney=CommonUtil.trim(map.get("ROOT.paymoney"));
+		String srcsysid=CommonUtil.trim(map.get("ROOT.srcsysid"));
+		String inputtime=CommonUtil.trim(map.get("ROOT.inputtime"));
+		String clientip=CommonUtil.trim(map.get("ROOT.clientip"));
+		String sign=CommonUtil.trim(map.get("ROOT.sign"));
+		if(paymentNumber.equals("")){
+			result.put("respCode",14);
+			result.put("respInfo", "传输的数据有误，支付记录编号为空!");
+			resultGson = gson.toJson(result);
+			return encodeUTF_8(resultGson);  
+		}
+		if(phoneNumber.equals("")){
+			result.put("respCode",14);
+			result.put("respInfo", "传输的数据有误，手机号码格式不正确!");
+			resultGson = gson.toJson(result);
+			return encodeUTF_8(resultGson);  
+		}
+		if(qqNumber.equals("")){
+			result.put("respCode",14);
+			result.put("respInfo", "传输的数据有误，QQ号码格式不正确!");
+			resultGson = gson.toJson(result);
+			return encodeUTF_8(resultGson);  
+		}
+		
+		if(productId.equals("")){
+			result.put("respCode",14);
+			result.put("respInfo", "传输的数据有误，产品Id为空了!");
+			resultGson = gson.toJson(result);
+			return encodeUTF_8(resultGson);  
+		}
+		if(paymoney.equals("")){
+			result.put("respCode",14);
+			result.put("respInfo", "传输的数据有误，支付金额格式不正确!");
+			resultGson = gson.toJson(result);
+			return encodeUTF_8(resultGson);  
+		}
+		
+		if(!srcsysid.equalsIgnoreCase("bestpay")){
+			result.put("respCode",14);
+			result.put("respInfo", "传输的数据有误，srcsysid不正确!");
+			resultGson = gson.toJson(result);
+			return encodeUTF_8(resultGson);  
+		}
+		if(inputtime.equalsIgnoreCase("")){
+			result.put("respCode",14);
+			result.put("respInfo", "传输的数据有误，inputtime为空!");
+			resultGson = gson.toJson(result);
+			return encodeUTF_8(resultGson);  
+		}
+		if(clientip.equalsIgnoreCase("")){
+			result.put("respCode",14);
+			result.put("respInfo", "传输的数据有误，clientip为空!");
+			resultGson = gson.toJson(result);
+			return encodeUTF_8(resultGson);  
+		}
+		paramBuffer=new StringBuffer("");
+		paramBuffer.append("paymentNumber").append(paymentNumber);
+		paramBuffer.append("phoneNumber").append(phoneNumber);
+		paramBuffer.append("qqNumber").append(qqNumber);
+		paramBuffer.append("productId").append(productId);
+		paramBuffer.append("paymoney").append(paymoney);
+		paramBuffer.append("srcsysid").append(srcsysid);
+		paramBuffer.append("inputtime").append(inputtime);
+		paramBuffer.append("clientip").append(clientip);
+		paramBuffer.append(Constant.MD5KEY_BESTPAY);
+		
+		if(!sign.equalsIgnoreCase(DigestUtils.md5Hex(paramBuffer.toString()))){
+			result.put("respCode",14);
+			result.put("respInfo", "传输的数据有误，sign签名不正确！");
+			resultGson = gson.toJson(result);
+			return encodeUTF_8(resultGson); 
+		}
+		
+		HashMap<String, String> paraMap = new HashMap<String, String>();
+		paraMap.put("paymentNumber", paymentNumber);
+		paraMap.put("phoneNumber", phoneNumber);
+		paraMap.put("qqNumber", qqNumber);
+		paraMap.put("productId", productId);
+		paraMap.put("paymoney", paymoney);
+		paraMap.put("srcsysid", srcsysid);
+		paraMap.put("inputtime", inputtime); 
+		String responseGson = null;
+		URL url;
+		try {
+			url = new URL(Constant.INNER_PREURL + bestPayUrl);
+			// 打开连接
+			HttpURLConnection conn = (HttpURLConnection) url.openConnection(); 
+			// 设置提交方式
+			conn.setDoOutput(true);
+			conn.setDoInput(true);
+			// 配置本次连接的Content-Type
+			conn.setRequestProperty("Content-Type", "text/html;charset=UTF-8");
+			// 维持长连接
+			conn.setRequestProperty("Connection", "Keep-Alive");
+			// 设置浏览器编码
+			conn.setRequestProperty("Charset", "UTF-8");
+			PrintWriter out = new PrintWriter(conn.getOutputStream());
+			// 将请求参数数据向服务器端发送
+			out.write(AlipayCore.createLinkString(paraMap));
+			out.flush();
+			out.close();
+			if (conn.getResponseCode() == 200) {
+				// 获得服务器端输出流
+				InputStream is = conn.getInputStream();
+				byte[] buffer = new byte[1024];
+				ByteArrayOutputStream bos = new ByteArrayOutputStream();
+				int len = 0;
+				while ((len = is.read(buffer)) != -1) {
+					bos.write(buffer, 0, len);
+				}
+				is.close();
+				responseGson = new String(bos.toByteArray());
+				System.out.println("response1Gson:"+responseGson);
+				responseGson = URLDecoder.decode(responseGson,"UTF-8"); 
+				System.out.println("response2Gson:"+responseGson);
+			} else {
+				 
+				result.put("respCode",-202);
+				result.put("respInfo", "移动支付服务出现未处理异常！");
+				responseGson = gson.toJson(result); 
+			}
+		} catch (MalformedURLException e) {  
+			result.put("respCode",-203);
+			result.put("respInfo", "连接移动支付服务失败！");
+			responseGson = gson.toJson(result);
+		} catch (IOException e) {  
+			result.put("respCode",-203);
+			result.put("respInfo", "连接移动支付服务失败！");
+			responseGson = gson.toJson(result);
+		}
+		return encodeUTF_8(responseGson); 
+		
+		//return encodeUTF_8("{\"resCode\":0,\"resInfo\":\"充值成功\"}"); 
+	}
+	
+    public String channelStatus(String accessVoucher ,String parasXml){
+        Date curDate=new Date();
+		
+		StringBuffer paramBuffer=new StringBuffer("");
+		paramBuffer.append(" channelStatus ");
+		paramBuffer.append(CommonUtil.doDateForm(curDate, "yyyy-MM-dd HH:mm:ss"));
+		paramBuffer.append( "   "+accessVoucher);
+		paramBuffer.append( "   "+parasXml);
+		CommonUtil.appendLog("webservice",paramBuffer.toString());
+    	return encodeUTF_8("{\"respCode\":0,\"respInfo\":\"操作成功\",\"restQuota\":300001}"); 
+    	
+    }
+    private  String encodeUTF_8(String result){
+		try{
+			result=URLEncoder.encode(result, "UTF-8");
+		}catch(Exception ex){
+			
+		}
+		return result;
+	}
+    
+}

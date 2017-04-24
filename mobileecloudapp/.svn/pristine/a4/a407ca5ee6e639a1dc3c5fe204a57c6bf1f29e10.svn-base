@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="utf-8"?>  
+<RelativeLayout  
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:attrs="http://schemas.android.com/apk/res/com.ris.mobile.express"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" 
+    android:background="@color/background" >   
+    <include 
+        android:id="@+id/topTitle" 
+        layout="@layout/title_bar"  
+    />  
+    <ScrollView 
+	        android:scrollbarThumbVertical="@drawable/scrollbar_handle_vertical" 
+	        android:focusableInTouchMode="true" 
+	        android:layout_width="fill_parent" 
+	        android:layout_height="fill_parent" 
+	        android:layout_below="@id/topTitle"
+	        android:background="@color/background" > 
+	        
+    
+    
+    <LinearLayout 
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" 
+        android:orientation="vertical"
+         > 
+        
+        
+        
+           <RelativeLayout
+                android:id="@+id/rl_Faq"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/row_height"
+                android:layout_marginTop="@dimen/row_margin" 
+                android:background="@drawable/row_selector"
+                android:paddingLeft="@dimen/row_padding_left"
+                android:paddingRight="@dimen/row_padding_right" >
+
+                <TextView
+                    style="@style/text_black_16"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:drawableLeft="@drawable/ic_setting_faq"
+                    android:drawablePadding="6dp"
+                    android:duplicateParentState="true"
+                    android:gravity="center_vertical"
+                    android:text="@string/text_setting_faq"/>
+
+                <TextView
+                    android:textColor="@color/gray"
+                    android:text="" 
+                    android:textSize="@dimen/textSize_normal" 
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@+id/iv_ArrowFaq"
+                    android:paddingRight="@dimen/row_padding_right" />
+
+                <ImageView 
+                    android:id="@+id/iv_ArrowFaq"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentRight="true"
+                    android:duplicateParentState="true"
+                    android:gravity="center_vertical"
+                    android:src="@drawable/arrow_go" />
+            </RelativeLayout> 
+            
+           
+           
+           <RelativeLayout
+                android:id="@+id/rl_Update"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/row_height"
+                android:layout_marginTop="@dimen/row_margin" 
+                android:background="@drawable/row_selector"
+                android:paddingLeft="@dimen/row_padding_left"
+                android:paddingRight="@dimen/row_padding_right" >
+
+                <TextView
+                    style="@style/text_black_16"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:drawableLeft="@drawable/ic_setting_update"
+                    android:drawablePadding="6dp"
+                    android:duplicateParentState="true"
+                    android:gravity="center_vertical"
+                    android:text="@string/text_setting_update"/>
+
+                <TextView
+                    android:id="@+id/tv_Version"
+                    android:textColor="@color/gray"
+                     
+                    android:textSize="@dimen/textSize_normal" 
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@+id/iv_ArrowUpdate"
+                    android:paddingRight="@dimen/row_padding_right" />
+
+                <ImageView 
+                    android:id="@+id/iv_ArrowUpdate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentRight="true"
+                    android:duplicateParentState="true"
+                    android:gravity="center_vertical"
+                    android:src="@drawable/arrow_go" />
+            </RelativeLayout> 
+            
+           
+           
+           <RelativeLayout
+                android:id="@+id/rl_About"
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/row_height"
+                android:layout_marginTop="@dimen/row_margin" 
+                android:background="@drawable/row_selector"
+                android:paddingLeft="@dimen/row_padding_left"
+                android:paddingRight="@dimen/row_padding_right" >
+
+                <TextView
+                    style="@style/text_black_16"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center_vertical"
+                    android:drawableLeft="@drawable/ic_setting_about"
+                    android:drawablePadding="6dp"
+                    android:duplicateParentState="true"
+                    android:gravity="center_vertical"
+                    android:text="@string/text_setting_about"/>
+
+                <TextView 
+                    android:textColor="@color/gray" 
+                    android:textSize="@dimen/textSize_normal" 
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toLeftOf="@+id/iv_ArrowAbout"
+                    android:paddingRight="@dimen/row_padding_right" />
+
+                <ImageView 
+                    android:id="@+id/iv_ArrowAbout"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentRight="true"
+                    android:duplicateParentState="true"
+                    android:gravity="center_vertical"
+                    android:src="@drawable/arrow_go" />
+            </RelativeLayout> 
+         
+    </LinearLayout>
+    </ScrollView>
+      
+</RelativeLayout>

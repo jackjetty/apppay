@@ -1,0 +1,344 @@
+/*** Eclipse Class Decompiler plugin, copyright (c) 2012 Chao Chen (cnfree2000@hotmail.com) ***/
+package com.bestpay.plugin;
+
+import android.app.AlertDialog;
+import android.app.AlertDialog.Builder;
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.content.DialogInterface.OnClickListener;
+import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Build.VERSION;
+import android.os.Environment;
+import android.os.Handler;
+import android.os.Message;
+import android.telephony.TelephonyManager;
+import android.util.Log;
+import android.widget.Toast;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpResponse;
+import org.apache.http.StatusLine;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ClientConnectionManager;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.conn.ssl.X509HostnameVerifier;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.SingleClientConnManager;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
+import org.json.JSONObject;
+
+public class CheckApkUpdater {
+	public String imei;
+	public String imsi;
+	public String mtype;
+	public String mtyb;
+	public String numer;
+	public String release;
+	public PackageInfo pkg;
+	public String clientVersion;
+	public final String downloadURL = "https://client.bestpay.com.cn/MEPF_INF2/httppost/";
+	public UrlEncodedFormEntity entity;
+	public String url;
+	public final int MESSAGE_SHOW_UPDATE_DIALOG = 1;
+	public final int MESSAGE_SHOW_DOWNLOAD_PROGRESS = 2;
+	public final int MESSAGE_CANCEL_PROGRESS_DIALOG = 3;
+	public final int MESSAGE_INTERNET_EXCEPTION = 4;
+	public int totalSize = 0;
+	public int downedSize = 0;
+	public Context context;
+	public String serverVersion;
+	public ProgressDialog progressDialog;
+	Handler handler1 = new Handler() {
+		public void dispatchMessage(Message msg) {
+			switch (msg.what) {
+			case 1:
+				CheckApkUpdater.this.alertUpdateDialog();
+				break;
+			case 2:
+				CheckApkUpdater.this.alertProgressDialog();
+				break;
+			case 3:
+				CheckApkUpdater.this.progressDialog.cancel();
+				break;
+			case 4:
+				Toast.makeText(CheckApkUpdater.this.context, "获取网络异常，请检查网络连接！",
+						1).show();
+			}
+
+			super.handleMessage(msg);
+		}
+	};
+
+	Runnable run2 = new Runnable() {
+		public void run() {
+			File sdDir = null;
+			boolean sdCardExist = Environment.getExternalStorageState().equals(
+					"mounted");
+			if (sdCardExist)
+				sdDir = Environment.getExternalStorageDirectory();
+			try {
+				Log.d("geek", "url" + CheckApkUpdater.this.url);
+				CheckApkUpdater.this.download(CheckApkUpdater.this.url, sdDir.getAbsolutePath(),
+						"bestpayplugin.apk", CheckApkUpdater.this.handler1);
+				
+				/*download(String url, String filepath, String filename,
+						Handler handler) */
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	};
+
+	public CheckApkUpdater(Context context) {
+		this.context = context;
+	}
+
+	public void alertUpdateDialog() {
+		AlertDialog.Builder builder = new AlertDialog.Builder(this.context);
+		builder.setTitle("版本更新");
+		builder.setMessage("发现新版本，是否要更新？");
+		builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+				try {
+					new Thread(CheckApkUpdater.this.run2).start();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+		builder.setNegativeButton("取消", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int which) {
+			}
+		});
+		builder.show();
+	}
+
+	public void alertProgressDialog() {
+		this.progressDialog = new ProgressDialog(this.context);
+		this.progressDialog.setTitle("下载进度");
+		this.progressDialog.setMax(this.totalSize);
+
+		this.progressDialog.setCancelable(true);
+		this.progressDialog.setProgressStyle(1);
+		this.progressDialog.show();
+
+		final Timer timer = new Timer();
+		timer.schedule(new TimerTask( ) {
+			public void run() {
+				
+				CheckApkUpdater.this.progressDialog
+						.setProgress(CheckApkUpdater.this.downedSize);
+
+				if (CheckApkUpdater.this.progressDialog.getMax() == CheckApkUpdater.this.progressDialog
+						.getProgress()) {
+					CheckApkUpdater.this.handler1.sendEmptyMessage(3);
+					timer.cancel();
+				}
+			}
+		}, 200L, 200L);
+	}
+
+	public String ApkUpdater(Context context) {
+		getInfo(context);
+		String returns = "";
+		InputStream is = null;
+		String fileName = "https://client.bestpay.com.cn/MEPF_INF2/httppost/"
+				.substring("https://client.bestpay.com.cn/MEPF_INF2/httppost/"
+						.lastIndexOf("/") + 1);
+
+		HostnameVerifier hostnameVerifier = SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER;
+		SchemeRegistry registry = new SchemeRegistry();
+		SSLSocketFactory socketFactory = SSLSocketFactory.getSocketFactory();
+		socketFactory
+				.setHostnameVerifier((X509HostnameVerifier) hostnameVerifier);
+		registry.register(new Scheme("https", socketFactory, 443));
+		registry.register(new Scheme("http", PlainSocketFactory
+				.getSocketFactory(), 80));
+
+		DefaultHttpClient client = new DefaultHttpClient();
+		SingleClientConnManager mgr = new SingleClientConnManager(
+				client.getParams(), registry);
+		DefaultHttpClient httpClient = new DefaultHttpClient(mgr,
+				client.getParams());
+
+		HttpsURLConnection.setDefaultHostnameVerifier(hostnameVerifier);
+
+		SimpleDateFormat df = new SimpleDateFormat("yyyyMMddhhmmss");
+		List params = new ArrayList();
+		params.add(new BasicNameValuePair("method", "clientupdateAndApplist"));
+		params.add(new BasicNameValuePair("CHANNELID", "000000"));
+		params.add(new BasicNameValuePair("TYPE", "08"));
+		params.add(new BasicNameValuePair("IMSI", this.imsi));
+		params.add(new BasicNameValuePair("CURRENTVERSION", this.clientVersion));
+		params.add(new BasicNameValuePair("SYSTEM", "android"));
+		params.add(new BasicNameValuePair("SYSVERSION", this.release));
+		params.add(new BasicNameValuePair("PHONE", this.mtype));
+		params.add(new BasicNameValuePair("PRODUCTNO", this.numer));
+		params.add(new BasicNameValuePair("WIDGETVER", ""));
+		params.add(new BasicNameValuePair("MAXRECORD", ""));
+		params.add(new BasicNameValuePair("STARTRECORD", ""));
+		params.add(new BasicNameValuePair("LOCATION", ""));
+		try {
+			this.entity = new UrlEncodedFormEntity(params, "UTF-8");
+			//Log.d("geek", params);
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+		}
+
+		HttpPost httpPost = new HttpPost(
+				"https://client.bestpay.com.cn/MEPF_INF2/httppost/");
+		httpPost.setEntity(this.entity);
+		try {
+			HttpResponse response = httpClient.execute(httpPost);
+			if (response.getStatusLine().getStatusCode() == 200) {
+				returns = EntityUtils.toString(response.getEntity());
+
+				returns = returns.replace("returns:", "");
+				Log.d("geek", "returns:" + returns);
+				JSONObject obj = new JSONObject(returns);
+
+				String errorcode = obj.getString("ERRORCODE");
+				if ("000000".equals(errorcode)) {
+					if ((!(obj.isNull("URL"))) && (!(obj.isNull("VERSION")))) {
+						this.url = obj.getString("URL");
+
+						this.serverVersion = obj.getString("VERSION");
+						Log.d("geek", "url:" + this.url + "serverVersion:"
+								+ this.serverVersion);
+						int result = this.serverVersion
+								.compareTo(this.clientVersion);
+						if (result > 0) {
+							this.handler1.sendEmptyMessage(1);
+						}
+
+					}
+
+				} else
+					this.handler1.sendEmptyMessage(4);
+			}
+		} catch (Exception ex) {
+			String aa = ex.toString();
+			Log.d("geek", aa.toString());
+		} finally {
+			try {
+				if (is != null)
+					is.close();
+				client.getConnectionManager().shutdown();
+			} catch (IOException localIOException1) {
+			}
+		}
+		return returns;
+	}
+
+	public File download(String url, String filepath, String filename,
+			Handler handler) throws ClientProtocolException, IOException {
+		FileOutputStream out = null;
+		InputStream in = null;
+		File file = null;
+		try {
+			StringBuffer buff = new StringBuffer(url);
+			HttpClient client = new DefaultHttpClient();
+			HttpGet get = new HttpGet(buff.toString());
+			HttpResponse response = client.execute(get);
+			HttpEntity entity2 = response.getEntity();
+			this.totalSize = (int) entity2.getContentLength();
+			Log.d("geek", "totalSize" + this.totalSize);
+
+			this.handler1.sendEmptyMessage(2);
+			if (response.getStatusLine().getStatusCode() == 200) {
+				in = response.getEntity().getContent();
+
+				File dir = new File(filepath);
+
+				if (!(dir.exists())) {
+					dir.mkdirs();
+				}
+				file = new File(filepath, filename);
+
+				if (!(file.exists())) {
+					file.createNewFile();
+				}
+				out = new FileOutputStream(file);
+
+				byte[] buffer = new byte[1024];
+				int len = 0;
+				while ((len = in.read(buffer)) != -1) {
+					out.write(buffer, 0, len);
+					this.downedSize += len;
+				}
+				install(file, this.context);
+				Log.d("geek", "复制完成:" + filepath + ":" + filename);
+			}
+		} finally {
+			if (out != null) {
+				out.close();
+			}
+			if (in != null) {
+				in.close();
+			}
+		}
+		Log.d("geek", "复制完成");
+		return file;
+	}
+
+	public void getInfo(Context context) {
+		TelephonyManager mTm = (TelephonyManager) context
+				.getSystemService("phone");
+		this.imei = mTm.getDeviceId();
+		this.imsi = mTm.getSubscriberId();
+		this.mtype = Build.MODEL;
+		this.mtyb = Build.BRAND;
+		this.numer = mTm.getLine1Number();
+		this.numer=this.numer.replace("+86" ,"");
+		Log.i("geek", "手机IMEI号：" + this.imei + "手机IESI号：" + this.imsi + "手机型号："
+				+ this.mtype + "手机品牌：" + this.mtyb + "手机号码" + this.numer);
+
+		String model = Build.MODEL;
+		this.release = Build.VERSION.RELEASE;
+		Log.d("geek", "release:" + this.release);
+		try {
+			this.pkg = context.getPackageManager().getPackageInfo(
+					"com.chinatelecom.bestpayplugin", 0);
+			String appName = this.pkg.applicationInfo.loadLabel(
+					context.getPackageManager()).toString();
+			Log.d("geek", appName);
+			this.clientVersion = this.pkg.versionName;
+			Log.d("geek", "clientVersion:" + this.clientVersion);
+		} catch (Exception e) {
+			e.printStackTrace();
+			this.clientVersion = "0.0.0";
+		}
+	}
+
+	public static void install(File file, Context context) {
+		Intent intent = new Intent("android.intent.action.VIEW");
+		intent.setDataAndType(Uri.fromFile(file),
+				"application/vnd.android.package-archive");
+		context.startActivity(intent);
+	}
+}

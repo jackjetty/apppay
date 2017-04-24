@@ -1,0 +1,66 @@
+package com.ris.mobile.ecloud.object;
+import java.io.Serializable;
+public class ApplyDealRecordObject  implements Serializable  {
+	
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = -469569981146323822L;
+	private String dealNumber;
+	private String applyId; 
+	private String userName;
+	private String status;
+	private String applyTitle;
+	private String applyType; 
+	private String dealTime;
+	
+	 
+	public String getDealNumber() {
+		return dealNumber;
+	}
+	public void setDealNumber(String dealNumber) {
+		this.dealNumber = dealNumber;
+	}
+	 
+	 
+	 
+	public String getStatus() {
+		return status;
+	}
+	public void setStatus(String status) {
+		this.status = status;
+	}
+	public String getDealTime() {
+		return dealTime;
+	}
+	public void setDealTime(String dealTime) {
+		this.dealTime = dealTime;
+	}
+	public String getApplyId() {
+		return applyId;
+	}
+	public void setApplyId(String applyId) {
+		this.applyId = applyId;
+	}
+	public String getUserName() {
+		return userName;
+	}
+	public void setUserName(String userName) {
+		this.userName = userName;
+	}
+	public String getApplyTitle() {
+		return applyTitle;
+	}
+	public void setApplyTitle(String applyTitle) {
+		this.applyTitle = applyTitle;
+	}
+	public String getApplyType() {
+		return applyType;
+	}
+	public void setApplyType(String applyType) {
+		this.applyType = applyType;
+	}
+	
+	
+	
+}

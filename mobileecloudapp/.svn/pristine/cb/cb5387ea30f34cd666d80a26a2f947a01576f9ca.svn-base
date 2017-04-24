@@ -1,0 +1,512 @@
+package com.ris.mobile.ecloud.activity;
+import java.util.ArrayList;
+import java.util.Random; 
+
+import android.content.ContentValues;
+import android.content.Context; 
+import android.content.Intent;
+
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
+import roboguice.inject.InjectView;
+ 
+  
+
+import com.ris.mobile.ecloud.R; 
+import com.ris.mobile.ecloud.adapter.ArticleFragmentPagerAdapter; 
+import com.ris.mobile.ecloud.adapter.ArticleFragmentStatePagerAdapter.OnExtraPageChangeListener;
+import com.ris.mobile.ecloud.adapter.FAQExpandAdapter;
+import com.ris.mobile.ecloud.adapter.FAQExpandAdapter.HandleClick;
+import com.ris.mobile.ecloud.BaseActivity;
+import com.ris.mobile.ecloud.BaseFragmentActivity;
+import com.ris.mobile.ecloud.LApplication;
+ 
+import com.ris.mobile.ecloud.log.CommonLog;
+import com.ris.mobile.ecloud.log.LogFactory;
+import com.ris.mobile.ecloud.object.AnnounceObject;
+import com.ris.mobile.ecloud.object.CategoryObject;
+import com.ris.mobile.ecloud.object.ConnectErrorObject;
+import com.ris.mobile.ecloud.object.FAQObject;
+import com.ris.mobile.ecloud.object.RequestObject;
+import com.ris.mobile.ecloud.parser.CategoryListParser;
+import com.ris.mobile.ecloud.parser.BaseParser;
+import com.ris.mobile.ecloud.parser.FAQListParser;
+import com.ris.mobile.ecloud.util.CommonUtil;
+import com.ris.mobile.ecloud.util.ScreenSizeUtil;
+import com.ris.mobile.ecloud.util.SharedPreferenceUtil;
+import com.ris.mobile.ecloud.widget.ColumnHorizontalScrollView;
+import com.ris.mobile.ecloud.widget.DelEditText;  
+import com.ris.mobile.ecloud.widget.PullToRefreshLayout;
+import com.ris.mobile.ecloud.widget.PullToRefreshLayout.OnRefreshListener;
+import com.ris.mobile.ecloud.widget.pullableview.PullableExpandableListView;
+import com.ris.mobile.ecloud.widget.pullableview.PullableListView;
+
+import android.content.Context;
+import android.content.res.ColorStateList;
+import android.content.res.Configuration;
+import android.content.res.Resources;
+import android.graphics.Rect;
+import android.os.Bundle;  
+import android.os.Handler;
+import android.os.Message;
+import android.support.v4.app.Fragment;  
+import android.support.v4.view.ViewPager;
+import android.support.v4.view.ViewPager.SimpleOnPageChangeListener;
+import android.text.InputType;
+import android.view.Gravity;
+import android.view.LayoutInflater;  
+import android.view.MotionEvent;
+import android.view.View;  
+import android.view.View.OnTouchListener;
+import android.view.ViewGroup;  
+import android.view.View.OnClickListener; 
+import android.view.ViewGroup.LayoutParams;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView; 
+import android.widget.Toast;
+      
+public class CategoryActivity  extends BaseFragmentActivity implements       OnClickListener{  
+ 
+	
+	@InjectView (R.id.tv_Back) 
+	private TextView tvBack;
+	
+	@InjectView (R.id.tv_Title)
+	private TextView tvTitle; 
+	
+	@InjectView (R.id.tv_Right)
+	private TextView tvRight;
+	
+	@InjectView (R.id.viewpager)
+	private ViewPager mViewpager;
+	
+	@InjectView (R.id.naviga_scroll)
+	private ColumnHorizontalScrollView mNaviga_scroll;
+	
+	@InjectView (R.id.naviga_view)
+	private LinearLayout mNavigation; 
+	
+	private int columnSelectIndex = 0;
+	private int mScreenWidth = 0;
+	private String articleTag;
+	
+	private ArrayList<CategoryObject> categoryList;
+	
+	public static LApplication lApplication=LApplication.getInstance();
+	private Context mContext; 
+	 
+	  
+	private SharedPreferenceUtil sharedPreferenceUtil; 
+	
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_category);
+		initData(getIntent());
+	 
+		initView();
+		setListener();
+	 
+	}
+	public    void initData(Intent intent){ 
+		mContext=CategoryActivity.this;
+		sharedPreferenceUtil=new SharedPreferenceUtil(mContext);
+		articleTag = CommonUtil.trim( intent.getStringExtra("articleTag"));
+		
+		
+	}
+	@Override
+	public void onConfigurationChanged(Configuration config) {
+			 super.onConfigurationChanged(config); 
+			if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
+			 
+			} 
+			if (config.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+			 
+			 
+			}
+	}
+	
+	public void initView(){
+	  	  
+		tvBack.setVisibility(View.VISIBLE);
+    	tvTitle.setVisibility(View.VISIBLE);
+    	tvTitle.setText(R.string.title_announce);
+    	if(articleTag.equalsIgnoreCase("announce"))
+    	        tvTitle.setText(R.string.title_announce);
+    	if(articleTag.equalsIgnoreCase("Recruit"))
+	        tvTitle.setText(R.string.title_recruit);
+    	if(articleTag.equalsIgnoreCase("New"))
+	        tvTitle.setText(R.string.title_new);
+    	if(articleTag.equalsIgnoreCase("Employ"))
+	        tvTitle.setText(R.string.title_employ);
+    	 
+    	tvRight.setVisibility(View.INVISIBLE);  
+    	BaseParser<List<CategoryObject>> responseParser = new CategoryListParser();
+    	HashMap<String, String> requestDataMap=new HashMap<String, String>();  
+		requestDataMap.put("userId",  sharedPreferenceUtil.getUserId() );
+		RequestObject vo = new RequestObject(R.string.url_announcelist, mContext, requestDataMap, responseParser); 
+		if(articleTag.equalsIgnoreCase("announce"))
+			vo = new RequestObject(R.string.url_announcelist, mContext, requestDataMap, responseParser); 
+		if(articleTag.equalsIgnoreCase("Recruit"))
+			vo = new RequestObject(R.string.url_recruitlist, mContext, requestDataMap, responseParser); 
+		if(articleTag.equalsIgnoreCase("New"))
+			vo = new RequestObject(R.string.url_newlist, mContext, requestDataMap, responseParser); 
+		if(articleTag.equalsIgnoreCase("Employ"))
+			vo = new RequestObject(R.string.url_employlist, mContext, requestDataMap, responseParser); 
+		
+		
+		getDataFromServer(vo, new  DataCallback<List<CategoryObject>>() {
+			@Override
+			public void processData(List<CategoryObject> paramObject, boolean paramBoolean) { 
+				 
+				categoryList=(ArrayList<CategoryObject>)  paramObject;
+				setViewPagerV(categoryList);
+				setNavigation(categoryList);	
+				
+				return;
+			}
+			@Override
+    		public void processError(ConnectErrorObject responseErrorVo){ 
+				 DisPlay("error",responseErrorVo.getErrInfo());
+				 
+    		}
+		},false); 
+    	
+    	 
+    	 
+    	 
+      }
+	
+	private void setViewPagerV(ArrayList<CategoryObject> naviga) {
+		
+		/*ArticleFragmentStatePagerAdapter articleFragmentStatePagerAdapter=new ArticleFragmentStatePagerAdapter(
+				getSupportFragmentManager(),mViewpager, naviga);
+		articleFragmentStatePagerAdapter.setOnExtraPageChangeListener(new OnExtraPageChangeListener(){
+			 public void onExtraPageSelected(int arg0){
+				 selectTab(arg0);
+			 }
+		});*/
+		//
+		mViewpager.setAdapter(new ArticleFragmentPagerAdapter(getSupportFragmentManager(),naviga));
+		//mViewpager.setOffscreenPageLimit(1); 
+		 mViewpager.setOnPageChangeListener(new SimpleOnPageChangeListener() {
+
+			@Override
+			public void onPageSelected(int arg0) {
+				selectTab(arg0);
+			}
+
+		}); 
+		
+	}
+	
+	/**
+	 * 选择的Column里面的Tab
+	 * */
+	private void selectTab(int tab_postion) {
+		columnSelectIndex = tab_postion * 2;
+		// for (int i = 0; i < mNavigation.getChildCount(); i++) {
+		View checkView = mNavigation.getChildAt(tab_postion * 2);
+		int k = checkView.getMeasuredWidth();
+		int l = checkView.getLeft();
+		int i2 = l + k / 2 - mScreenWidth / 2;
+		/*
+		log.e("left:"+l);
+		log.e("mScreenWidth:"+mScreenWidth);
+		log.e("MeasuredWidth:"+k);
+		log.e("i2:"+i2);*/
+		
+		//i2 = l  ;
+		 mNaviga_scroll.smoothScrollTo(i2, 0);
+		//mNaviga_scroll.smoothScrollTo(0, 0);
+		// rg_nav_content.getParent()).smoothScrollTo(i2, 0);
+		//移动
+		 
+		// mColumnHorizontalScrollView.smoothScrollTo((position - 2) *
+		// mItemWidth , 0);
+		// }
+		// 判断是否选中
+		for (int j = 0; j < mNavigation.getChildCount(); j++) {
+			View checkView1 = mNavigation.getChildAt(j);
+			if(CommonUtil.trim( checkView1.getTag()).indexOf("TABVIEW")<0){
+				continue;
+			}
+			boolean ischeck=false;
+			if (j == tab_postion * 2) {
+				ischeck = true;
+				 checkView1.findViewById(R.id.ivi_Tip).setVisibility(View.VISIBLE); 
+			} else {
+				ischeck = false;
+				checkView1.findViewById(R.id.ivi_Tip).setVisibility(View.INVISIBLE); 
+			}
+			
+			
+			checkView1.findViewById(R.id.itv_Title).setSelected(ischeck);
+			checkView1.setSelected(ischeck);
+		}
+	}
+	
+	
+	
+	/*
+	private void setNavigation(List<CategoryObject> naviga) {
+		int count = naviga.size();
+		//int dp2Px = ScreenSizeUtil.Dp2Px(this, 20);
+		int dp2Px=0;
+		int width = (ScreenSizeUtil.getScreenWidth(CategoryActivity.this) - 12 * 10 - 4
+				- dp2Px ) / 3;
+		//- 19
+		mNavigation.removeAllViews();
+		for (int i = 0; i < count; i++) {
+			
+			//LinearLayout titleLayout=new LinearLayout(this);  
+			//titleLayout.setOrientation(LinearLayout.VERTICAL);  
+			//LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(
+					//LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); 
+			
+			
+			
+			
+			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+					width, LayoutParams.WRAP_CONTENT);
+			params.leftMargin = 12;
+			params.rightMargin = 12;
+			params.bottomMargin=5;
+			params.topMargin=5;
+			TextView localTextView = new TextView(this);
+			//localTextView.setBackgroundResource(R.drawable.selector_navigation_btn); 
+			localTextView.setGravity(Gravity.CENTER);
+			localTextView.setPadding(0, 5, 0, 5);
+			localTextView.setId(i);
+			localTextView.setText(naviga.get(i).getCategoryName());
+			
+			Resources resource = (Resources) getBaseContext().getResources();  
+			ColorStateList csl = (ColorStateList) resource.getColorStateList(R.color.top_category_scroll_text_color_day);  
+			if (csl != null) {  
+				localTextView.setTextColor(csl);  
+			}  
+		  
+			 
+			localTextView.setTextSize(15);
+			if (columnSelectIndex == i) {
+				localTextView.setSelected(true);
+				//localTextView.setTextSize(18);
+			}
+			localTextView.setOnClickListener(new NavOnClickListener(localTextView) );
+			mNavigation.addView(localTextView, params);
+			
+			
+			//.addView(titleLayout, titleParams);
+			
+			
+			
+			if (i != count - 1) {
+				ImageView imageView = new ImageView(this);
+				
+				imageView.setImageResource(R.drawable.nav_line);
+				 
+				LinearLayout.LayoutParams split = new LinearLayout.LayoutParams(
+						LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+				mNavigation.addView(imageView, split);
+			}
+		}
+	}*/
+	private void setNavigation(List<CategoryObject> naviga) {
+		int count = naviga.size(); 
+		int dp2Px=0;
+		if(count==0)
+			 return;
+		int maxColNum=count>3?3:count;
+		
+		mScreenWidth=ScreenSizeUtil.getScreenWidth(CategoryActivity.this);
+		int width = (ScreenSizeUtil.getScreenWidth(CategoryActivity.this) - 12 *maxColNum*2 - (maxColNum-1)
+				- dp2Px ) / maxColNum;
+		 
+		mNavigation.removeAllViews();
+		for (int i = 0; i < count; i++) {
+			
+			//LinearLayout titleLayout=new LinearLayout(this);  
+			//titleLayout.setOrientation(LinearLayout.VERTICAL);  
+			//LinearLayout.LayoutParams titleParams = new LinearLayout.LayoutParams(
+					//LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); 
+			
+			View tabView=View.inflate(this,R.layout.item_nav_tab,null);  
+	
+		    TextView localTextView=(TextView)tabView.findViewById(R.id.itv_Title); 
+		    View iviTip= tabView.findViewById(R.id.ivi_Tip); 
+ 
+			
+			
+			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+					width, LayoutParams.WRAP_CONTENT);
+			params.leftMargin = 12;
+			params.rightMargin = 12;
+			// params.bottomMargin=5;
+			// params.topMargin=5;
+			 
+			
+			//TextView localTextView = new TextView(this);
+			//localTextView.setBackgroundResource(R.drawable.selector_navigation_btn); 
+			localTextView.setGravity(Gravity.CENTER);
+			localTextView.setPadding(0, 5, 0, 5);
+			//localTextView.setId(i);
+			localTextView.setText(naviga.get(i).getCategoryName());
+			
+			Resources resource = (Resources) getBaseContext().getResources();  
+			ColorStateList csl = (ColorStateList) resource.getColorStateList(R.color.top_category_scroll_text_color_day);  
+			if (csl != null) {  
+				localTextView.setTextColor(csl);  
+			}  
+		  
+			 
+			localTextView.setTextSize(15);
+			iviTip.setVisibility(View.INVISIBLE);
+			if (columnSelectIndex == i) {
+				localTextView.setSelected(true);
+				iviTip.setVisibility(View.VISIBLE);
+				//localTextView.setTextSize(18);
+			}
+			tabView.setTag("TABVIEW"+i);
+			tabView.setOnClickListener(new NavOnClickListener(tabView ) );
+			
+			 
+			
+			
+			mNavigation.addView(tabView, params);
+			//LayoutParams lp;        
+	        //lp=tabView.getLayoutParams();
+ 
+			
+			
+			//.addView(titleLayout, titleParams);
+			
+			
+			
+			if (i != count - 1) {
+				ImageView imageView = new ImageView(this);
+				
+				imageView.setImageResource(R.drawable.nav_line);
+				 
+				LinearLayout.LayoutParams split = new LinearLayout.LayoutParams(
+						LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+				//split.bottomMargin=5;
+				mNavigation.addView(imageView, split);
+			}
+		}
+	}
+	
+	
+	private class NavOnClickListener implements OnClickListener{
+	    
+	    private View tabView;
+	    
+	    
+	    public   NavOnClickListener(View tabView ){
+	    	this.tabView=tabView;
+	    	 
+	    }
+
+		@Override
+		public void onClick(View v) {
+			TextView localTextView;
+			View iviTip;
+			for (int i = 0; i < mNavigation.getChildCount();i++ ) {
+				View localView = mNavigation.getChildAt(i);
+				if(CommonUtil.trim( localView.getTag()).indexOf("TABVIEW")<0){
+					continue;
+				}
+				
+				localTextView= (TextView)localView.findViewById(R.id.itv_Title); 
+			    iviTip= localView.findViewById(R.id.ivi_Tip); 
+				
+				if (localView != v){
+					localTextView.setSelected(false);
+					iviTip.setVisibility(View.INVISIBLE); 
+				}
+					
+				else {
+					localTextView.setSelected(true);
+					iviTip.setVisibility(View.VISIBLE);
+					mViewpager.setCurrentItem(i / 2);
+					/*if(localView instanceof TextView)
+						   ( (TextView)localView).setTextSize(18);*/ 
+				}
+				 
+			}
+		}
+ 
+	
+}
+	
+	/*
+	private class NavOnClickListener implements OnClickListener{
+		    private TextView localTextView;
+		    
+		    public   NavOnClickListener(TextView localTextView){
+		    	this.localTextView=localTextView;
+		    	
+		    }
+ 
+			@Override
+			public void onClick(View v) {
+				for (int i = 0; i < mNavigation.getChildCount();i++ ) {
+					View localView = mNavigation.getChildAt(i);
+					 
+					if (localView != v){
+						localView.setSelected(false);
+						if(localView instanceof TextView)
+						   ( (TextView)localView).setTextSize(15);
+					}
+						
+					else {
+						localView.setSelected(true);
+						mViewpager.setCurrentItem(i / 2);
+						 if(localView instanceof TextView)
+							   ( (TextView)localView).setTextSize(18); 
+					}
+					 
+				}
+			}
+	 
+		
+	}*/
+	
+	
+	 public void setListener(){
+	    	tvBack.setOnClickListener(this); 
+	    	 
+	    	 
+	    }
+	 @Override
+	 public void onClick(View v) {
+			// TODO Auto-generated method stub
+			switch (v.getId()) {
+			  case R.id.tv_Back:
+				 this.finish();
+				 break; 
+		    }
+			
+			
+		} 
+	 
+	    @Override
+		public void onStart() {
+			super.onStart();
+		
+		} 
+	 
+		@Override
+		public void onDestroy(){
+			 
+			super.onDestroy();
+		}
+		
+}
+	

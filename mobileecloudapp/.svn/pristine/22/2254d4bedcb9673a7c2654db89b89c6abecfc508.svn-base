@@ -1,0 +1,304 @@
+package com.ris.mobile.ecloud.activity;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Vector;
+
+import roboguice.inject.InjectView;
+
+import com.ris.mobile.ecloud.BaseActivity;
+import com.ris.mobile.ecloud.R;
+import com.ris.mobile.ecloud.LApplication;
+import com.ris.mobile.ecloud.engine.MyWebViewClient;
+import com.ris.mobile.ecloud.engine.WebAppInterface;
+import com.ris.mobile.ecloud.log.CommonLog;
+import com.ris.mobile.ecloud.log.LogFactory;
+import com.ris.mobile.ecloud.object.ConnectErrorObject;
+import com.ris.mobile.ecloud.object.RequestObject;
+import com.ris.mobile.ecloud.object.ResponseObject;
+import com.ris.mobile.ecloud.parser.BaseParser;
+import com.ris.mobile.ecloud.parser.ResponseParser;
+import com.ris.mobile.ecloud.util.CommonUtil;
+import com.ris.mobile.ecloud.util.ScreenSizeUtil;
+
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.Intent;
+import android.content.pm.ActivityInfo;
+import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Vibrator;
+import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.util.Log;
+import android.view.Gravity;
+import android.view.SurfaceHolder;
+import android.view.SurfaceHolder.Callback;
+import android.view.SurfaceView;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup.LayoutParams;
+import android.view.WindowManager;
+import android.webkit.ConsoleMessage;
+import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
+import android.webkit.WebChromeClient.CustomViewCallback;
+import android.webkit.WebSettings.PluginState;
+import android.webkit.WebSettings.RenderPriority;
+import android.webkit.WebView;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+public class WebViewActivity extends BaseActivity implements OnClickListener {
+
+	
+	public static LApplication lApplication = LApplication.getInstance();
+	
+	@InjectView (R.id.tv_Back)
+	private TextView tvBack;
+	
+	@InjectView (R.id.tv_Title)
+	private TextView tvTitle;
+	
+	@InjectView (R.id.tv_Right)
+	private TextView tvRight;
+	
+	@InjectView (R.id.tv_Back)
+	private View myView = null;
+	
+	@InjectView (R.id.mProgress)
+	private ProgressBar mprogressBar;
+	
+	@InjectView (R.id.web)
+	private WebView mWebView;
+	
+	@InjectView (R.id.rl_WebView)
+	private RelativeLayout rlWebView;
+	
+	@InjectView (R.id.topTitle)
+	private View topTitle;
+	
+	private String wapUrl;
+	private String wapTitle;
+	
+	
+	private WebChromeClient chromeClient = null;
+	private WebChromeClient.CustomViewCallback myCallBack = null;
+	
+	
+	
+
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_webview);
+		 
+		initData(getIntent());
+		 
+		initView();
+		setListener();
+
+	}
+
+	 
+
+	public void initData(Intent intent) {
+
+		// 从Intent当中根据key取得value
+		wapUrl = intent.getStringExtra("wapUrl");
+		wapTitle = intent.getStringExtra("wapTitle");
+		wapUrl = CommonUtil.trim(wapUrl);
+		wapTitle = CommonUtil.trim(wapTitle);
+
+		// Bundle myBundelForGetName=this.getIntent().getExtras();
+		// String name=myBundelForGetName.getString("Key_Name");
+		// wapUrl="http://www.baidu.com";
+		// wapTitle="wap页面";
+
+	}
+
+	@SuppressLint("JavascriptInterface")
+	public void initView() {
+
+		tvBack.setVisibility(View.VISIBLE);
+		tvTitle.setVisibility(View.VISIBLE);
+		tvTitle.setText(wapTitle);
+		tvRight.setVisibility(View.INVISIBLE);
+		//rlWebView.setSystemUiVisibility(View.INVISIBLE);
+		WebSettings settings = mWebView.getSettings();
+		settings.setPluginState(PluginState.ON);
+		mWebView.getSettings().setJavaScriptEnabled(true);
+		mWebView.getSettings().setJavaScriptCanOpenWindowsAutomatically(true);
+		//mWebView.getSettings().setBuiltInZoomControls(true);
+		//mWebView.getSettings().setUseWideViewPort(true);
+		//mWebView.getSettings().setRenderPriority(RenderPriority.HIGH);
+		// mWebView.getSettings().setBlockNetworkImage(true);
+		//mWebView.getSettings().setPluginsEnabled(true);
+		mWebView.addJavascriptInterface(new WebAppInterface(this), "Android");
+		mWebView.loadData("", "text/html", null);
+		//mWebView.loadUrl("javascript:alert(injectedObject.toString())");
+		// mWebView.setInitialScale(39);
+		mWebView.setWebViewClient(new MyWebViewClient(mprogressBar));
+
+		/*
+		 * mWebView.setWebChromeClient(new WebChromeClient() {
+		 * 
+		 * @Override public void onProgressChanged(WebView view, int
+		 * newProgress) { // TODO Auto-generated method stub //
+		 * MainActivity.this.setProgress(newProgress * 100);
+		 * mprogressBar.setProgress(newProgress); }
+		 * 
+		 * 
+		 * @Override public void onShowCustomView(View view, CustomViewCallback
+		 * callback) { if(myView != null){ callback.onCustomViewHidden();
+		 * return; } rlWebView.removeView(mWebView); rlWebView.addView(view);
+		 * myView = view; myCallBack = callback; }
+		 * 
+		 * @Override public void onHideCustomView() { if(myView == null){
+		 * return; } rlWebView.removeView(myView); myView = null;
+		 * rlWebView.addView(mWebView); myCallBack.onCustomViewHidden(); }
+		 * 
+		 * @Override public boolean onConsoleMessage(ConsoleMessage
+		 * consoleMessage) { // TODO Auto-generated method stub Log.d("ZR",
+		 * consoleMessage
+		 * .message()+" at "+consoleMessage.sourceId()+":"+consoleMessage
+		 * .lineNumber()); return super.onConsoleMessage(consoleMessage); } });
+		 */
+		chromeClient = new MyChromeClient();
+
+		mWebView.setWebChromeClient(chromeClient);
+		mWebView.getSettings().setCacheMode(WebSettings.LOAD_NO_CACHE);
+		mWebView.getSettings().setLayoutAlgorithm(
+				WebSettings.LayoutAlgorithm.NARROW_COLUMNS);
+
+		mWebView.setHorizontalScrollBarEnabled(false);
+		mWebView.setVerticalScrollBarEnabled(false);
+
+		final String USER_AGENT_STRING = mWebView.getSettings()
+				.getUserAgentString() + " Rong/2.0";
+		mWebView.getSettings().setUserAgentString(USER_AGENT_STRING);
+		mWebView.getSettings().setSupportZoom(false);
+		mWebView.getSettings().setPluginState(WebSettings.PluginState.ON);
+		mWebView.getSettings().setLoadWithOverviewMode(true);
+		mWebView.loadUrl(wapUrl);
+
+	}
+
+	public void setListener() {
+		tvBack.setOnClickListener(this);
+	}
+
+	public class MyChromeClient extends WebChromeClient {
+
+		@Override
+		public void onProgressChanged(WebView view, int newProgress) {
+			// TODO Auto-generated method stub
+			// MainActivity.this.setProgress(newProgress * 100);
+			mprogressBar.setProgress(newProgress);
+		}
+
+		@Override
+		public void onShowCustomView(View view, CustomViewCallback callback) {
+			if (myView != null) {
+				callback.onCustomViewHidden();
+				return;
+			}
+			
+			rlWebView.removeView(mWebView);
+			
+			WebViewActivity.this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+			LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(LayoutParams.FILL_PARENT
+					 , ScreenSizeUtil.getScreenHeight(WebViewActivity.this));
+			//
+			rlWebView.addView(view,params);
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+			myView = view;
+			myCallBack = callback;
+		}
+
+		@Override
+		public void onHideCustomView() {
+			if (myView == null) {
+				return;
+			}
+			
+			WebViewActivity.this.getWindow().setFlags(0, WindowManager.LayoutParams.FLAG_FULLSCREEN);
+			rlWebView.removeView(myView);
+			myView = null; 
+			rlWebView.addView(mWebView);
+			setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+			myCallBack.onCustomViewHidden();
+		}
+
+		@Override
+		public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+			// TODO Auto-generated method stub
+			Log.d("ZR",
+					consoleMessage.message() + " at "
+							+ consoleMessage.sourceId() + ":"
+							+ consoleMessage.lineNumber());
+			return super.onConsoleMessage(consoleMessage);
+		}
+	}
+
+	/*
+	 * @Override public void onConfigurationChanged(Configuration config) {
+	 * super.onConfigurationChanged(config); if (config.orientation ==
+	 * Configuration.ORIENTATION_PORTRAIT) {
+	 * 
+	 * } if (config.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+	 * 
+	 * 
+	 * } }
+	 */
+	@Override
+	public void onClick(View v) {
+		// TODO Auto-generated method stub
+		switch (v.getId()) {
+		case R.id.tv_Back:
+			WebViewActivity.this.finish();
+			break;
+		}
+	}
+
+	 
+	  @Override  
+	  protected void onPause () { 
+		  mWebView.reload();
+	      super.onPause ();
+	 }
+	 
+	@Override
+	public void onBackPressed() {
+		if (myView == null) {
+			mWebView.reload();
+			super.onBackPressed();
+		} else {
+			chromeClient.onHideCustomView();
+		}
+	}
+}

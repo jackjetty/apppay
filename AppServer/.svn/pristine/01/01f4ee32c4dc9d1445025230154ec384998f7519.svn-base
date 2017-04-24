@@ -1,0 +1,134 @@
+package com.rising.appserver;
+
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+
+import org.apache.commons.httpclient.Cookie;
+import org.apache.commons.httpclient.DefaultHttpMethodRetryHandler;
+import org.apache.commons.httpclient.HttpClient;
+import org.apache.commons.httpclient.HttpStatus;
+import org.apache.commons.httpclient.cookie.CookiePolicy;
+import org.apache.commons.httpclient.methods.GetMethod;
+import org.apache.commons.httpclient.params.HttpClientParams;
+import org.apache.commons.httpclient.params.HttpMethodParams;
+
+import com.rising.appserver.factory.HttpFactory;
+
+
+public class Test{
+	public final static String USER_AGENT_H = "User-Agent";
+	public final static String USER_AGENT = "Mozilla/5.0 (Windows NT 6.2; WOW64) AppleWebKit/537.22 (KHTML, like Gecko) Chrome/25.0.1364.172 Safari/537.22";
+	public final static String UTF_8 = "UTF-8"; 
+	private   HttpClient client ;
+	
+	public Test(Cookie[] cookieArr){
+		//HttpFactory http = HttpFactory.getInstance();
+		//client = http.getClient();
+		
+		client=new HttpClient();
+		HttpClientParams params = client.getParams();
+		params.setContentCharset("utf-8");
+		client.getParams().setCookiePolicy(CookiePolicy.BROWSER_COMPATIBILITY);
+		client.getParams().setParameter("http.protocol.single-cookie-header",
+				true); 
+		
+		for(Cookie cookie:cookieArr){
+		 
+			//(String domain, String name, String value, String path, Date expires, boolean secure) 
+		 client.getState().addCookie(new Cookie(cookie.getDomain(), cookie.getName(),  cookie.getValue(),cookie.getPath(),cookie.getExpiryDate(),cookie.getSecure() )); 
+			//client.getState().addCookie(cookie); 
+		}
+		
+		
+//		client.getState().addCookie(new Cookie("ptlogin2.qq.com", "pt_login_sig", "hePI0cCTxaxZYBsAGnKA7jyhYKC47dtsk7FvL9Ju2NCIyqFm6O8nPkwU2bivEc-n"  )); 
+//		client.getState().addCookie(new Cookie("qq.com", "pt_clientip", "7077b788dc16e36b"  )); 
+//		client.getState().addCookie(new Cookie("qq.com", "pt_serverip", "b13f0abf06623538"  )); 
+//		client.getState().addCookie(new Cookie("ui.ptlogin2.qq.com", "login_param", "appid%3D11000101%26f_url%3Dloginerroralert%26link_target%3Dtop%26ep%3Dhttp%253A%2F%2Fpay.qq.com%2Fcgi-bin%2Flogin%2Fqqacctlogin.cgi%26s_url%3Dhttp%253A%2F%2Fpay.qq.com%2F%26qlogin_jumpname%3Dpayjump%26qlogin_param%3Durl%253Dhttp%25253A%2F%2Fpay.qq.com"  )); 
+//		client.getState().addCookie(new Cookie("ptlogin2.qq.com", "uikey", "d5aa672b3d8d72f56a7a45c6fa0a12cc81ba8fdeb187cd5eb5bc953d731c99ba"  ));  
+//		client.getState().addCookie(new Cookie("ui.ptlogin2.qq.com", "ptui_identifier", "000DCE04FE1B6CFDFABCDD754AA7BD957A5265B20D5AB621E729E888"  )); 
+//		client.getState().addCookie(new Cookie("ptlogin2.qq.com", "confirmuin", "0"  )); 
+//		client.getState().addCookie(new Cookie("ptlogin2.qq.com", "ptvfsession", "2230e2f8d41c633fbd78cd40b1de462f8aa72c0a4a1b6079f8985178120bd840e687dd6fab702caad30cf5e28aca4a6b41f6cc374be7a28f"  )); 
+//		client.getState().addCookie(new Cookie("qq.com", "pt2gguin", "o0494180070"  )); 
+//		client.getState().addCookie(new Cookie("qq.com", "uin", "o0494180070"  )); 
+//		client.getState().addCookie(new Cookie("qq.com", "skey", "@jDJJ5BeDA"  ));
+//		client.getState().addCookie(new Cookie("ptlogin2.qq.com", "ETK", ""  )); 
+//		client.getState().addCookie(new Cookie("ptlogin2.qq.com", "superuin", "o0494180070"  ));
+//		client.getState().addCookie(new Cookie("ptlogin2.qq.com", "superkey", "pazk4tglc0ZQaNv4VN4xR7Chnmz9FbKkuiPQ6wGWlo4_"  )); 
+//		client.getState().addCookie(new Cookie("ptlogin2.qq.com", "supertoken", "1462206608"  ));
+//		client.getState().addCookie(new Cookie("qq.com", "ptisp", "ctc"  )); 
+//		client.getState().addCookie(new Cookie("qq.com", "RK", "AG0TjkVoa7"  ));
+//		client.getState().addCookie(new Cookie("ptlogin2.qq.com", "ptnick_494180070", "e6988ee69c88e785a7e68891e5bf83"  )); 
+//		client.getState().addCookie(new Cookie("qq.com", "ptcz", "9d0e7aecbdc188b464c2e43744543715d6afbd0dd10849171273bd7d32d6a0d6"  )); 
+//		   
+//		   
+//		   
+		   
+		   
+		  
+		   
+		   
+		   
+		String url = "http://pay.qq.com/";
+		try {  
+			GetMethod get = new GetMethod(url);
+			get.setRequestHeader("Referer", "http://pay.qq.com/");
+			get.setRequestHeader("User-Agent",
+					"Mozilla/5.0 (Windows NT 6.1; rv:32.0) Gecko/20100101 Firefox/32.0"); 
+
+			get.setRequestHeader("Connection", "keep-alive");
+			// get.addRequestHeader("Content-Type",
+			// "application/x-www-form-urlencoded;charset=UTF-8");
+
+			// 使用系统提供的默认的恢复策略
+			get.getParams().setParameter(HttpMethodParams.RETRY_HANDLER,
+					new DefaultHttpMethodRetryHandler());
+			// 定义一个输入流
+			InputStream ins = null;
+			// 定义文件流
+			BufferedReader br = null;
+
+			int statusCode = client.executeMethod(get);
+			if (statusCode != HttpStatus.SC_OK) {
+				System.err.println("方法失败: " + get.getStatusLine());
+			}
+
+			// 使用getResponseBodyAsStream读取页面内容，这个方法对于目标地址中有大量数据需要传输是最佳的。
+			ins = get.getResponseBodyAsStream();
+			String charset = get.getResponseCharSet();
+			// System.out.println(charset);
+			if (charset.toUpperCase().equals("ISO-8859-1")) {
+				charset = "gbk";
+			}
+			charset = "utf-8";
+			// 按服务器编码字符集构建文件流，这里的CHARSET要根据实际情况设置
+			br = new BufferedReader(new InputStreamReader(ins,
+					get.getResponseCharSet()));
+			StringBuffer sbf = new StringBuffer();
+			String line = null;
+			while ((line = br.readLine()) != null) {
+				sbf.append(line);
+				sbf.append("\n");
+			}
+			String result = new String(sbf.toString().getBytes(
+					get.getResponseCharSet()), charset);
+			// 输出内容
+			 System.out.println(result);
+			br.close();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			String info = "【群发信息失败】" + e.getMessage();
+			System.err.println(info);
+
+		}
+		
+		
+	}
+	
+	
+	public static void main(String[] args){
+		
+	 
+	}
+}

@@ -1,0 +1,8 @@
+package com.ris.mobile.ecloud;
+
+import roboguice.activity.RoboActivity;
+
+public abstract class BaseFragment  {
+	
+	
+}

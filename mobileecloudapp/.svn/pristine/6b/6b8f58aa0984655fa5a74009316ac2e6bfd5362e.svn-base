@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/layout_CONTENT"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:orientation="vertical" 
+        android:background="@color/table_background" >
+
+            <RelativeLayout
+               
+                android:layout_width="match_parent"
+                android:layout_height="@dimen/item_height"
+                android:background="@drawable/row_selector" >
+
+                <ImageView
+                    android:id="@+id/iiv_Flag"
+                    android:layout_width="55dp"
+                    android:layout_height="50dp"
+                    android:layout_marginLeft="@dimen/table_margin"
+                    android:layout_marginRight="@dimen/table_margin"
+                    android:layout_marginTop="10dip"
+                    android:layout_marginBottom="@dimen/table_margin"
+                    android:src="@drawable/bill_iccard_success" />
+
+                <RelativeLayout 
+                    android:id="@+id/rl_Top"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" 
+                    android:layout_marginLeft="@dimen/row_padding_left"
+                    android:layout_marginTop="10dip"
+                    android:layout_toRightOf="@id/iiv_Flag" >
+
+                    <TextView
+                        android:id="@+id/itv_DealNumber" 
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/textSize_large" 
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="2164516513216" 
+                        android:ellipsize="end"
+                        android:singleLine="true"/>
+
+                    <TextView 
+                        android:id="@+id/itv_ParName" 
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="@dimen/textSize_large"  
+                        android:layout_centerVertical="true"
+                        android:layout_alignParentRight="true"
+                        android:layout_marginRight="20dip"
+                        android:text="50元"
+                        android:textColor="@color/black"/>
+                </RelativeLayout>
+                
+                <LinearLayout 
+			        android:layout_width="match_parent"
+			        android:layout_height="wrap_content" 
+			        android:orientation="horizontal"
+			        android:padding="@dimen/content_padding"
+			        android:layout_alignParentBottom="true"
+                    android:layout_alignLeft="@id/rl_Top" >
+                    
+                    <TextView
+                    android:id="@+id/itv_AccountId" 
+                    android:textSize="@dimen/textSize_small" 
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" 
+                    android:ellipsize="end"
+                    android:singleLine="true"
+                    android:textColor="@color/gray"
+                    android:text="卡号:1223165"
+                    />
+                    
+                    <TextView
+                        android:id="@+id/itv_DealTime" 
+                        android:textSize="@dimen/textSize_small" 
+                        android:layout_width="0dip"
+                        android:layout_weight="1"
+                        android:layout_height="wrap_content" 
+                        android:layout_gravity="center_vertical" 
+                        android:gravity="center"
+                        android:text="3月5日 13:35"
+                        android:textColor="@color/gray"
+                        android:ellipsize="end"
+                        android:singleLine="true" />
+                    
+                    
+               </LinearLayout>     
+                
+                    
+                     
+
+                
+            </RelativeLayout>
+          <!--    <ImageView
+                   android:layout_width="match_parent"
+                   android:layout_height="wrap_content" 
+                   android:src="@drawable/divider"
+                   ></ImageView>-->
+</LinearLayout>
+ 

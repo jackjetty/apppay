@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent">
+    <ImageView 
+        android:id="@+id/iv_Launch"
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:src="@drawable/launch_bg"
+        android:scaleType="centerCrop"/>
+    <LinearLayout
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:paddingBottom="15dip"
+        android:visibility="gone"
+        android:layout_alignParentBottom="true" >
+
+        <TextView
+            android:id="@+id/tv_Version"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/tip_launch_version"
+            android:textColor="@color/white"
+            android:textSize="15sp" />
+
+        <TextView
+            android:id="@+id/tv_CopyRight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="15dip"
+            android:text="@string/tip_launch_copyright"
+           
+            android:textColor="@color/white"
+            android:textSize="15sp" />
+    </LinearLayout>
+     <!-- android:textColor="#ff888888" -->
+
+</RelativeLayout>

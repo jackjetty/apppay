@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:background="@color/main_bg_color">
+   <include 
+        android:id="@+id/topTitle" 
+        layout="@layout/title_bar"  
+     />  
+   <com.ris.mobile.ecloud.widget.PullToRefreshLayout
+        android:id="@+id/refresh_view"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/topTitle" >
+
+        <include layout="@layout/allview_refresh_head" />
+        <!-- 支持所有实现Pullable接口的View -->
+
+        <com.ris.mobile.ecloud.widget.pullableview.PullableListView
+            android:id="@+id/lv_ApplyBill"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+             
+            android:divider="@drawable/divider"
+             />
+
+        <include layout="@layout/allview_load_more" />
+    </com.ris.mobile.ecloud.widget.PullToRefreshLayout>
+    
+    <LinearLayout 
+        android:orientation="vertical" 
+        android:layout_width="wrap_content"
+         android:layout_height="wrap_content" 
+          android:layout_centerInParent="true"
+          android:id="@+id/ll_NoRecord" 
+          android:layout_marginTop="-50dip"> 
+    
+             <ImageView android:layout_gravity="center_horizontal"
+              android:layout_width="120dip" 
+              android:layout_height="120dip" 
+               android:src="@drawable/norecord" /> 
+               
+             <TextView android:textSize="16.0sp" 
+            android:textColor="#ff909090" 
+            android:layout_gravity="center_horizontal" 
+            android:layout_width="wrap_content" 
+            android:layout_marginTop="15dip"
+            android:layout_height="wrap_content" android:text="您暂无报名缴费记录"  />
+    </LinearLayout>           
+</RelativeLayout>

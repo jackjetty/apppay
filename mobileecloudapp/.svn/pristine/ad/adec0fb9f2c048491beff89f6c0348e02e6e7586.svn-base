@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:background="@color/white" >
+   <include 
+        android:id="@+id/topTitle" 
+        layout="@layout/title_bar"  
+     />  
+    <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" android:layout_height="fill_parent" android:layout_below="@id/topTitle"> 
+        <ImageView android:layout_gravity="center_horizontal"
+             android:id="@+id/about_image"
+              android:layout_width="120dip" 
+              android:layout_height="120dip" android:layout_marginTop="50dip" android:src="@drawable/qr" />
+        
+        <TextView android:textSize="16.0sp" 
+            android:textColor="#ff909090" 
+            android:layout_gravity="center_horizontal" 
+            android:id="@+id/tv_AboutVersion" 
+            android:layout_width="wrap_content" 
+            android:layout_marginTop="15dip"
+            android:layout_height="wrap_content" android:text="e云通 V1.6"  />
+        
+        
+    </LinearLayout>
+    
+    
+    <LinearLayout android:orientation="vertical" android:layout_width="fill_parent" 
+        android:layout_height="wrap_content"   
+        android:layout_alignParentBottom="true" android:layout_marginBottom="25.0dip" > 
+       <TextView android:textSize="14.0sp" android:textColor="#ff909090" 
+           android:gravity="center_horizontal" android:layout_width="fill_parent" 
+           android:layout_height="wrap_content" android:text="浙江邮电职业技术学院" 
+            
+            android:singleLine="true" />
+       <TextView android:layout_marginTop="15.0dip" 
+           android:textSize="14.0sp" 
+           android:textColor="#ff909090"
+            android:gravity="center_horizontal" 
+             
+            android:layout_width="fill_parent" android:layout_height="wrap_content" 
+            android:text="Copyright©ZPTC.All Rights Reserved."
+              android:singleLine="true" />
+    </LinearLayout>
+</RelativeLayout>

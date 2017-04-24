@@ -1,0 +1,234 @@
+<?xml version="1.0" encoding="utf-8"?>  
+<RelativeLayout  
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:attrs="http://schemas.android.com/apk/res/com.ris.mobile.express"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" 
+    android:background="@color/background" >   
+    <LinearLayout  
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignParentTop="true" 
+        android:orientation="vertical" >  
+        <RelativeLayout 
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="6"
+            android:gravity="center" > 
+            <FrameLayout
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent" > 
+                <com.ris.mobile.ecloud.widget.MyGallery
+                    android:id="@+id/gl_Banner"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:background="@drawable/advertise_default"
+                    android:fadingEdgeLength="0.0dp" 
+                    android:soundEffectsEnabled="false" />
+
+                <LinearLayout
+                    android:id="@+id/ll_bottomNavPoint"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom|center"
+                    android:background="#00000000"
+                    android:gravity="center"
+                    android:orientation="vertical"
+                    android:paddingBottom="3dp" >
+
+                    <LinearLayout
+                        android:id="@+id/ll_focus_container"
+                        android:layout_width="fill_parent"
+                        android:layout_height="wrap_content"
+                        android:gravity="center"
+                        android:orientation="horizontal" />
+                </LinearLayout>
+            </FrameLayout>
+
+            <TextView
+                android:id="@+id/tv_winphone_list"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="left"
+                android:scrollbars="vertical"
+                android:text=""
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
+        </RelativeLayout>
+       <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/divider" />
+       
+       
+       
+       
+     <LinearLayout
+        android:layout_weight="3"
+        android:layout_marginTop="1dp"
+        android:layout_marginBottom="1dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" 
+        android:orientation="horizontal" >        
+           <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingLeft="1dp" 
+            android:paddingRight="0.5dp"
+            android:paddingTop="1dp"
+            android:paddingBottom="1dp">
+
+            <RelativeLayout 
+                android:id="@+id/rl_Announce"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1" 
+                android:background="@drawable/row_selector">
+
+                <TextView 
+                    android:layout_centerInParent="true"
+                    android:drawableTop="@drawable/home_announce"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="10dp" 
+                    android:gravity="center"
+                    android:text="公示公告" 
+                    android:textSize="@dimen/textSize_normal" 
+                    android:textColor="@color/tab_normal_color"/>
+            </RelativeLayout>
+
+            <RelativeLayout 
+                android:id="@+id/rl_ICCard"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="1dp"
+                android:layout_weight="1"
+                android:background="@drawable/row_selector"
+                >
+
+                <TextView
+                     android:drawablePadding="10dp"
+                    android:layout_centerInParent="true"
+                    android:drawableTop="@drawable/home_iccard"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" 
+                    android:gravity="center"
+                    android:text="一卡通充值" 
+                    android:textSize="@dimen/textSize_normal" 
+                    android:textColor="@color/tab_normal_color" />
+            </RelativeLayout>
+            
+            
+            <RelativeLayout 
+                android:id="@+id/rl_Recruit"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="1dp" 
+                android:layout_weight="1"
+                android:background="@drawable/row_selector"
+                 >
+
+                <TextView
+                   android:drawablePadding="10dp"
+                   android:layout_centerInParent="true"
+                    android:drawableTop="@drawable/home_recruit"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" 
+                    android:gravity="center"
+                    android:text="招生信息"
+                    android:textSize="@dimen/textSize_normal" 
+                    android:textColor="@color/tab_normal_color" />
+            </RelativeLayout>
+        </LinearLayout>
+        
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:orientation="vertical"
+            android:paddingLeft="0.5dp" 
+            android:paddingRight="1dp"
+            android:paddingTop="1dp"
+            android:paddingBottom="1dp"
+             >
+
+            <RelativeLayout 
+                android:id="@+id/rl_New"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/row_selector" >
+
+                <TextView
+                    android:drawablePadding="10dp"
+                     android:layout_centerInParent="true"
+                    android:drawableTop="@drawable/home_new"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" 
+                    android:gravity="center_horizontal"
+                    android:text="校园新闻" 
+                    android:textSize="@dimen/textSize_normal" 
+                    android:textColor="@color/tab_normal_color"/>
+            </RelativeLayout>
+
+            <RelativeLayout
+                android:id="@+id/rl_Apply"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="1dp"
+                android:layout_weight="1"
+                android:background="@drawable/row_selector" >
+
+                <TextView
+                    android:layout_marginLeft="10dp"
+                    android:drawablePadding="10dp"
+                    android:drawableTop="@drawable/home_apply"
+                    android:layout_centerInParent="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" 
+                    android:gravity="center"
+                    android:text="报名缴费"
+                    android:textSize="@dimen/textSize_normal" 
+                    android:textColor="@color/tab_normal_color" />
+            </RelativeLayout>
+            
+            
+            <RelativeLayout
+                android:id="@+id/rl_Employ"
+                android:gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_marginTop="1dp"
+                android:layout_weight="1"
+                android:background="@drawable/row_selector"  >
+
+                <TextView
+                    android:layout_marginLeft="10dp"
+                    android:drawablePadding="10dp"
+                    android:drawableTop="@drawable/home_employ"
+                    android:layout_centerInParent="true"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" 
+                    android:gravity="center"
+                    android:text="就业信息"
+                    android:textSize="@dimen/textSize_normal" 
+                    android:textColor="@color/tab_normal_color" />
+            </RelativeLayout>
+        </LinearLayout>
+        </LinearLayout>  
+    </LinearLayout>
+    
+    
+     
+
+       
+     
+ 
+      
+</RelativeLayout>

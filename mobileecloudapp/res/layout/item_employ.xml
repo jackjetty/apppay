@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RelativeLayout android:layout_width="fill_parent" 
+   android:layout_height ="55.0dip"
+   xmlns:android="http://schemas.android.com/apk/res/android" 
+   android:background="@drawable/row_selector"  
+   android:paddingLeft="5dip"
+   android:paddingRight="8dip"
+  >        
+    <TextView  
+          android:id="@+id/itv_Title" 
+          android:textColor="#ff343434"
+          android:layout_gravity="center_vertical"   
+          android:layout_width="wrap_content" 
+          android:layout_height="wrap_content"   
+          android:textSize="@dimen/textSize_large" 
+          android:layout_alignParentTop="true"
+          android:layout_marginTop="5dip"
+          android:layout_marginLeft="10.0dip" 
+          android:layout_marginRight="20dip"
+          android:layout_marginBottom="5dip"
+          android:singleLine="true" 
+          android:ellipsize="end" 
+          />   
+     <TextView     
+                    android:id="@+id/itv_IssueDate"  
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/gray"
+                    android:textSize="@dimen/textSize_normal" 
+                    android:layout_marginLeft="12.0dip"  
+                    android:duplicateParentState="true" 
+                    android:layout_below="@id/itv_Title"
+                    android:ellipsize="end"
+                    android:singleLine="true"  />
+     
+     
+     <ImageView 
+                    android:id="@+id/iv_ArrowFaq"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                     android:layout_alignParentRight="true"
+                     android:layout_centerInParent="true"
+                    android:scaleType="center"  
+                    android:src="@drawable/arrow_go" />
+</RelativeLayout>

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:clickable="true">
+    
+    
+     <LinearLayout 
+        android:orientation="vertical" 
+        android:layout_width="wrap_content"
+         android:layout_height="wrap_content" 
+          android:layout_gravity="center"
+          android:id="@+id/ll_NoRecord" 
+          android:layout_marginTop="-50dip"> 
+    
+             <ImageView android:layout_gravity="center_horizontal"
+              android:layout_width="120dip" 
+              android:layout_height="120dip" 
+               android:src="@drawable/norecord" /> 
+               
+             <TextView android:textSize="16.0sp" 
+            android:textColor="#ff909090" 
+            android:layout_gravity="center_horizontal" 
+            android:layout_width="wrap_content" 
+            android:layout_marginTop="15dip"
+            android:layout_height="wrap_content" android:text="您暂无充值记录"  />
+    </LinearLayout>           
+    
+     
+    
+</FrameLayout>

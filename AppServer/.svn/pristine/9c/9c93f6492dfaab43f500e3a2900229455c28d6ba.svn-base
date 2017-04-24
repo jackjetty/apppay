@@ -1,0 +1,132 @@
+package com.rising.appserver;
+
+import java.util.Properties;
+
+import org.springframework.mail.MailSender;
+import org.springframework.mail.SimpleMailMessage;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+
+/** */
+/**
+ * 
+ * 抽象父类,定义了发送邮件的函数,取得getMailSender函数留待子类实现
+ * 
+ * @author: 何杨(heyang78@gmail.com)
+ * 
+ * @date: 2008-8-6-下午03:11:38
+ */
+
+public   class BaseMailSender {
+
+	protected String userName;
+
+	protected String password;
+
+	protected String stmpServer;
+
+	protected String senderEmailAddr;
+
+	/** */
+	/**
+	 * 
+	 * 取得邮件发送者,留待子类实现
+	 * 
+	 * @return
+	 */
+
+	protected     MailSender getMailSender() {
+
+		JavaMailSenderImpl sender = new JavaMailSenderImpl();
+
+		// 邮件发送者邮箱SMTP服务器
+
+		sender.setHost(stmpServer);
+
+		// 邮件发送者邮箱用户
+
+		sender.setUsername(userName);
+
+		// 邮件发送者邮箱密码
+
+		sender.setPassword(password);
+
+		// 客户端认证设置
+
+		Properties props = new Properties();
+
+		// 同时通过验证
+
+		props.put("mail.smtp.auth", "true");
+
+		// 存储发送邮件服务器的信息
+
+		props.put("mail.smtp.host", stmpServer);
+
+		// 服务器端认证设置
+
+		sender.setJavaMailProperties(props);
+
+		return sender;
+
+	}
+	/** */
+	/**
+	 * 
+	 * 发送邮件
+	 * 
+	 * @param from
+	 *            :寄信人邮件地址
+	 * 
+	 * @param to
+	 *            :收信人邮件地址
+	 * 
+	 * @param subject
+	 *            :邮件标题
+	 * 
+	 * @param concept
+	 *            :邮件内容
+	 */
+
+	public final void sendMail(String to, String subject, String concept) {
+
+		SimpleMailMessage msg = new SimpleMailMessage();
+
+		msg.setFrom(senderEmailAddr);
+
+		msg.setTo(to);
+
+		msg.setSubject(subject);
+
+		msg.setText(concept);
+
+		MailSender sender = getMailSender();
+
+		sender.send(msg);
+
+	}
+
+	public void setPassword(String password) {
+
+		this.password = password;
+
+	}
+
+	public void setSenderEmailAddr(String senderEmailAddr) {
+
+		this.senderEmailAddr = senderEmailAddr;
+
+	}
+
+	public void setStmpServer(String stmpServer) {
+
+		this.stmpServer = stmpServer;
+
+	}
+
+	public void setUserName(String userName) {
+
+		this.userName = userName;
+
+	}
+
+}

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" 
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" 
+        android:orientation="vertical" 
+        android:background="@color/table_background" >
+
+            <RelativeLayout
+               
+                android:layout_width="match_parent"
+                android:layout_height="80dp"
+                android:background="@drawable/row_selector" >
+
+                <ImageView
+                    android:id="@+id/iiv_Apply"
+                    android:layout_width="80dp"
+                    android:layout_height="70dp"
+                    android:layout_marginLeft="@dimen/table_margin"
+                    
+                    android:layout_marginTop="@dimen/table_margin"
+                    android:layout_marginBottom="@dimen/table_margin"
+                    android:scaleType="fitXY" 
+                    android:src="@drawable/load_default" />
+                
+                
+                <ImageView 
+                    android:id="@+id/iiv_Go"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_alignParentRight="true"
+                    android:layout_centerInParent="true"
+                    android:scaleType="center"  
+                    android:layout_marginRight="@dimen/table_margin"
+                    android:src="@drawable/arrow_go" />
+
+                <LinearLayout  
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" 
+                    android:layout_marginLeft="5dip"
+                    android:layout_marginRight="5dip"
+                    android:layout_marginTop="10dip"
+                    android:layout_toRightOf="@id/iiv_Apply" 
+                    android:layout_toLeftOf="@id/iiv_Go" 
+                    android:layout_centerInParent="true"
+                    android:orientation="vertical" 
+                    >
+                    
+                    
+                    
+
+                    <TextView
+                        android:id="@+id/itv_ApplyTitle" 
+                        android:textColor="@color/black"
+                        android:textSize="@dimen/textSize_normal" 
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_centerVertical="true"
+                        android:text="2016上半年全国英语四级考试" 
+                        android:ellipsize="end"
+                        android:singleLine="true"/>
+                    
+                     <LinearLayout 
+				        android:layout_width="match_parent"
+				        android:layout_height="wrap_content" 
+				        android:orientation="horizontal"
+				        android:padding="3dip"
+				        android:layout_marginTop="10dip"   >
+	                    
+	                    <TextView
+	                    android:id="@+id/itv_ApplySurplus" 
+	                    android:textSize="@dimen/textSize_small" 
+	                    android:layout_width="wrap_content"
+	                    android:layout_height="wrap_content" 
+	                    android:ellipsize="end"
+	                    android:singleLine="true"
+	                    android:textColor="@color/gray"
+	                    android:layout_marginRight="5dip"
+	                    android:text="名额:20"
+	                    />
+	                    
+	                    <TextView
+	                        android:id="@+id/itv_ApplyPeriod" 
+	                        android:textSize="@dimen/textSize_small" 
+	                        android:layout_width="0dip"
+	                        android:layout_weight="1"
+	                        android:layout_height="wrap_content" 
+	                        android:layout_gravity="center_vertical" 
+	                        android:gravity="center"
+	                        android:text="3月3日至4月3日"
+	                        android:textColor="@color/gray"
+	                        android:ellipsize="end"
+	                        android:singleLine="true" />
+	                    
+	                    
+	               </LinearLayout>     
+
+                     
+                </LinearLayout>
+                
+               
+                
+                 
+                
+            </RelativeLayout>
+</LinearLayout>
+ 

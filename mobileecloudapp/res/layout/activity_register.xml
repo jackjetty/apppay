@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:background="@color/main_bg_color" >
+   <include 
+        android:id="@+id/topTitle" 
+        layout="@layout/title_bar"  
+     /> 
+     <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:fadingEdge="none"
+        android:scrollbars="vertical" 
+        android:layout_below="@id/topTitle">
+        
+         <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:orientation="vertical" 
+            >
+           <LinearLayout  
+               android:gravity="center_vertical" 
+               android:background="@drawable/settings_mid" 
+               android:paddingTop="10.0dip" 
+               android:paddingBottom="10.0dip" 
+               android:layout_width="fill_parent" 
+               android:layout_height="@dimen/row_height"   >
+		         
+		        <EditText 
+		             android:id="@+id/et_PhoneNumber" 
+		             android:textSize="@dimen/textSize_normal" 
+		             android:textColorHint="@color/list_text_small_color"  
+		             android:drawableLeft="@drawable/login_icon_tel"
+		             android:background="@null"
+		             android:layout_width="fill_parent" 
+		             android:layout_height="@dimen/row_height" 
+		             android:layout_marginLeft="5.0dip" 
+		             android:drawablePadding="5dp" 
+		             android:padding="0dp"
+		             android:inputType="phone"
+		             android:hint="请输入手机号码(不可更改)" /> 
+		  </LinearLayout>
+		  
+           
+           <FrameLayout  
+               android:gravity="center_vertical" 
+               android:background="@drawable/settings_mid" 
+                 
+               android:layout_width="fill_parent" 
+               android:layout_height="@dimen/row_height" 
+                >
+		         
+		        <EditText 
+		             android:id="@+id/et_VerifyCode" 
+		             android:textSize="@dimen/textSize_normal" 
+		             android:textColorHint="@color/list_text_small_color"  
+		             android:drawableLeft="@drawable/login_icon_code"
+		             android:background="@null"
+		             android:layout_width="fill_parent" 
+		             android:layout_height="fill_parent" 
+		             android:layout_marginLeft="5.0dip" 
+		             android:drawablePadding="5dp"
+		             android:inputType="phone"
+		             android:hint="请输入验证码" /> 
+		             
+		        <Button 
+		               android:id="@+id/btn_Verify" 
+		               android:textSize="18dp"
+		               android:text="发送验证码" 
+		               android:padding="5dp"
+                       android:textColor="#ffffff"
+                       android:layout_gravity="right|center_vertical"
+		               android:background="@drawable/btn_verify" 
+		               android:layout_width="wrap_content"
+		               android:layout_height="wrap_content" 
+		               android:layout_marginRight="5.0dip" 
+		                />
+		        
+		  </FrameLayout>
+		  
+           
+           <LinearLayout  
+               android:gravity="center_vertical" 
+               android:background="@drawable/settings_mid" 
+                
+               android:layout_width="fill_parent" 
+               android:layout_height="@dimen/row_height"  >
+		         
+		        <EditText 
+		             android:id="@+id/et_Password" 
+		             android:textSize="@dimen/textSize_normal" 
+		             android:textColorHint="@color/list_text_small_color"  
+		             android:drawableLeft="@drawable/login_icon_password"
+		             android:background="@null"
+		             android:layout_width="fill_parent" 
+		             android:layout_height="fill_parent" 
+		             android:layout_marginLeft="5.0dip" 
+		             android:drawablePadding="5dp" 
+		             android:inputType="textPassword"
+		             android:hint="请输入6-20位字母、数字组成密码" /> 
+		  </LinearLayout>
+		  
+           
+           <LinearLayout  
+               android:gravity="center_vertical" 
+               android:background="@drawable/settings_mid" 
+                
+               android:layout_width="fill_parent" 
+               android:layout_height="@dimen/row_height"  >
+		         
+		        <EditText 
+		             android:id="@+id/et_ConfirmPassword" 
+		             android:textSize="@dimen/textSize_normal" 
+		             android:textColorHint="@color/list_text_small_color"  
+		             android:drawableLeft="@drawable/login_icon_password"
+		             android:background="@null"
+		             android:layout_width="fill_parent" 
+		             android:layout_height="fill_parent" 
+		             android:layout_marginLeft="5.0dip" 
+		             android:drawablePadding="5dp" 
+		             android:inputType="textPassword"
+		             android:hint="请再次输入密码" /> 
+		  </LinearLayout>
+		  
+           
+           <LinearLayout  
+               android:gravity="center_vertical" 
+               android:background="@drawable/settings_mid" 
+                
+               android:layout_width="fill_parent" 
+               android:layout_height="@dimen/row_height"  >
+		         
+		        <EditText 
+		             android:id="@+id/et_UserName" 
+		             android:textSize="@dimen/textSize_normal" 
+		             android:textColorHint="@color/list_text_small_color"  
+		             android:drawableLeft="@drawable/login_icon_account"
+		             android:background="@null"
+		             android:layout_width="fill_parent" 
+		             android:layout_height="fill_parent" 
+		             android:layout_marginLeft="5.0dip" 
+		             android:drawablePadding="5dp" 
+		             android:hint="请输入姓名" /> 
+		  </LinearLayout>
+		  
+           
+           <LinearLayout  
+               android:gravity="center_vertical" 
+               android:background="@drawable/settings_bottom" 
+               
+               android:layout_width="fill_parent" 
+               android:layout_height="@dimen/row_height"  >
+		         
+		        <EditText 
+		             android:id="@+id/et_IDCard" 
+		             android:textSize="@dimen/textSize_normal" 
+		             android:textColorHint="@color/list_text_small_color"  
+		             android:drawableLeft="@drawable/login_icon_card"
+		             android:background="@null"
+		             android:layout_width="fill_parent" 
+		             android:layout_height="fill_parent" 
+		             android:layout_marginLeft="5.0dip" 
+		             android:drawablePadding="5dp" 
+		             android:digits="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
+		             android:hint="请输入身份证号码" /> 
+		  </LinearLayout>
+		  
+           
+           <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="45dip"
+                android:layout_margin="8dip"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" > 
+                
+                <CheckBox
+		            android:id="@+id/cb_Agree"
+		            style="@style/custom_checkbox_style"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:paddingTop="5dip"
+		            android:paddingBottom="5dip"
+		            android:text="我已阅读并同意"
+		            android:button="@drawable/cust_check_box_bg"
+		            android:textSize="14sp"  />
+                <TextView
+                    android:id="@+id/tv_ServiceAgree"
+                    android:paddingLeft="3dip"
+                    android:textSize="@dimen/textSize_normal" 
+                    android:textColor="@color/text_blue"
+                    android:text="服务协议"
+                    android:gravity="center_vertical"
+                    android:layout_width="fill_parent"
+                    android:layout_height="fill_parent"
+                    android:layout_weight="1" /> 
+            </LinearLayout>
+            
+           
+           <Button
+                android:id="@+id/btn_Register"
+                android:layout_width="fill_parent"
+                android:layout_height="50dip"
+                android:layout_marginLeft="8dip"
+                android:layout_marginRight="8dip"
+                android:layout_marginTop="10dip"
+                android:background="@drawable/btn_submit"
+                android:shadowColor="#7f000000"
+                android:shadowDx="0.0"
+                android:shadowDy="1.0"
+                android:shadowRadius="1.0"
+                android:text="注册"
+                android:textColor="#ffffff"
+                android:textSize="18sp" 
+                android:enabled="true"/>
+           
+           
+            <TextView
+		        android:id="@+id/tv_Prompt"
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="center_vertical"
+		        android:layout_marginLeft="15dip"
+		        android:layout_marginRight="15dip"
+		        android:layout_marginTop="20dip"
+		        android:layout_marginBottom="10dip"
+		        android:drawablePadding="3dip" 
+		        android:padding="3.0dip"
+		        android:text="温馨提示：\n          本院在校学生和教工请用学号、工号直接登录激活账号（密码问题学生请咨询班主任，教工请咨询信息中心），请勿再自行注册校外用户账号！"
+		        android:singleLine="false" 
+		        android:textColor="@color/darkgray"
+		        android:lineSpacingExtra="3dp"
+		        android:textSize="13.0dip" 
+		        />
+		   
+         </LinearLayout>
+         
+    </ScrollView> 
+</RelativeLayout>

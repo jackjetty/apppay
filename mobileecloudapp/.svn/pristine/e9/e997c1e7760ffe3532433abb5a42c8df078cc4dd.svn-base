@@ -1,0 +1,237 @@
+package com.ris.mobile.ecloud.activity; 
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Vector;
+
+import roboguice.inject.InjectView;
+
+import com.ris.mobile.ecloud.BaseActivity;
+import com.ris.mobile.ecloud.R; 
+import com.ris.mobile.ecloud.LApplication; 
+import com.ris.mobile.ecloud.object.ConnectErrorObject; 
+import com.ris.mobile.ecloud.object.RequestObject;
+import com.ris.mobile.ecloud.object.ResponseObject; 
+import com.ris.mobile.ecloud.parser.BaseParser;
+import com.ris.mobile.ecloud.parser.ResponseParser;
+import com.ris.mobile.ecloud.util.CommonUtil; 
+import com.ris.mobile.ecloud.util.Constant;
+import com.ris.mobile.ecloud.util.SharedPreferenceUtil;
+
+import android.app.Activity;
+import android.app.Dialog;
+import android.content.Context;
+import android.content.Intent; 
+import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.media.AudioManager;
+import android.media.MediaPlayer;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Handler;
+import android.os.Vibrator;
+import android.provider.MediaStore;
+import android.text.Editable;
+import android.text.TextUtils;
+import android.text.TextWatcher;
+import android.view.Gravity;
+import android.view.SurfaceHolder;
+import android.view.SurfaceHolder.Callback;
+import android.view.SurfaceView;
+import android.view.View;
+import android.view.View.OnClickListener;  
+import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.FrameLayout;
+import android.widget.GridView;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
+import android.widget.TextView;
+import android.widget.Toast;  
+public class FeedBackActivity  extends BaseActivity  implements  OnClickListener {
+	
+	@InjectView (R.id.tv_Back) 
+	private TextView tvBack;
+	
+	@InjectView (R.id.tv_Title) 
+	private TextView tvTitle;
+	
+	@InjectView (R.id.tv_Right) 
+	private TextView tvRight;
+	
+	@InjectView (R.id.et_Content) 
+	private EditText etContent;
+	
+	@InjectView (R.id.tv_Num) 
+	private TextView tvNum;
+	
+	@InjectView (R.id.et_Location) 
+	private EditText etLocation;
+ 
+ 
+	private int len,num;
+	
+	public static LApplication lApplication=LApplication.getInstance();
+	private SharedPreferenceUtil sharedPreferenceUtil;
+	
+	public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_feedback);
+		initData(getIntent());
+		 
+		initView();
+		setListener();
+		 
+	}
+	 
+    public    void initData(Intent intent){ 
+    	len=0;
+    	num=500;
+    	sharedPreferenceUtil=new SharedPreferenceUtil(FeedBackActivity.this);
+	}
+    public void initView(){
+  	  
+		tvBack.setVisibility(View.VISIBLE);
+    	tvTitle.setVisibility(View.VISIBLE);
+    	tvTitle.setText(R.string.title_feedback);
+    	tvRight.setVisibility(View.VISIBLE);
+    	tvRight.setText("提交");
+    	
+    	etLocation.setText(""); 
+    	len = etContent.length();
+		len=num-len;
+		tvNum.setText(len+"/"+num);
+		
+		etContent.requestFocus();
+		((InputMethodManager)getSystemService(INPUT_METHOD_SERVICE)).showSoftInput(etContent, 0); 
+    	 
+	}
+    public void setListener(){
+		tvBack.setOnClickListener(this); 
+		tvRight.setOnClickListener(this);
+		
+		
+		etContent.addTextChangedListener(new TextWatcher() {
+			
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				   // TODO Auto-generated method stub
+				    String resultcontent = etContent.getText().toString();
+					len = resultcontent.length();
+					if (len <= num) {
+						len = num - len;
+						tvNum.setTextColor(getResources().getColor(R.color.gray));
+						tvNum.setText(String.valueOf(len)+"/"+num);
+						}
+					
+					 else {					
+						len = len - num;
+						tvNum.setTextColor(Color.RED);
+						tvNum.setText("-"+String.valueOf(len)+"/"+num);
+
+					}
+
+			}
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count,
+					int after) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+			@Override
+			public void afterTextChanged(Editable s) {
+				// TODO Auto-generated method stub
+				
+			}
+		}); 
+		
+	}
+    @Override
+	public void onConfigurationChanged(Configuration config) {
+			 super.onConfigurationChanged(config); 
+			if (config.orientation == Configuration.ORIENTATION_PORTRAIT) {
+			 
+			} 
+			if (config.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+			 
+			 
+			}
+	}
+    
+    
+    @Override
+	public void onClick(View v) {
+		// TODO Auto-generated method stub
+		switch (v.getId()) {
+		  case R.id.tv_Back:
+			  FeedBackActivity.this.finish();
+			 break;
+		  case R.id.tv_Right:
+			  String adviceContent=CommonUtil.trim(etContent.getText().toString());
+			  
+			  String location=CommonUtil.trim(etLocation.getText().toString());
+			   
+			  if(adviceContent.equals("")){
+				  DisPlay("error","请输入意见建议！！");
+				  etContent.requestFocus();
+				  return;
+			  }
+			  if(len>num){
+				  DisPlay("error","一次提交只能"+num+"字！！");
+				  etContent.requestFocus();
+				  return;
+			  }
+			   
+			  
+			  
+			  HashMap<String, String> requestDataMap=new HashMap<String, String>(); 
+			  requestDataMap.put("content", adviceContent);
+			  requestDataMap.put("contactWay",location );  
+			  requestDataMap.put("userId",  sharedPreferenceUtil.getUserId() );
+			  	 
+
+              BaseParser<ResponseObject> responseParser = new ResponseParser();
+			  
+		      RequestObject vo = new RequestObject(R.string.url_feedback, this, requestDataMap, responseParser);
+		      getDataFromServer(vo, new DataCallback<ResponseObject>() {
+					@Override
+					public void processData(ResponseObject paramObject, boolean paramBoolean) { 
+						  if(paramObject.isSuccess()){
+							  DisPlay("correct", paramObject.getInfo()); 
+							  FeedBackActivity.this.finish(); 
+						  }else{
+							  DisPlay("error", paramObject.getInfo());  
+						  } 
+						  
+					}
+					@Override
+		    		public void processError(ConnectErrorObject responseErrorVo){
+						 DisPlay("error",responseErrorVo.getErrInfo());
+						 
+		    		}
+				});
+			 
+			  
+			   
+			  
+			  break;
+		}
+	}
+    
+    
+	
+}
+
+
+
+

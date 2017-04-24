@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no,minimum-scale=1.0,maximum-scale=1.0"/>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="format-detection" content="telephone=no">
+<title>展示一</title>
+<script type="text/javascript" src="js/jquery-1.7.2.js"></script>
+<script type="text/javascript">
+var listIndex = 0;
+$(function(){
+	getData(1);
+}); 
+function getData(index){
+	var xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?><mcp type=\"request\"><params><param id=\"PageIndex\" value=\""+index+"\"/></params></mcp>";
+	$.ajax({
+		url : "publicInfo/get",
+		data : xml,
+		dataType : "text",
+		type : "post",
+		success : function(data) {
+			data = decodeURIComponent(data.replace(/\+/g, '%20'));
+			data = jQuery.parseJSON(data);
+				var rows = data.listPublicInfo;
+				for(var i=0;i<rows.length;i++){
+					var Title = $("<h1 style=\"text-align: center;\"id=\"title"+listIndex+"\"></h1>");
+					Title.append(rows[i].Title);
+					var PublicInfo = $("<article id=\"PublicInfo"+listIndex+"\" style=\"text-indent:2em;font-size: 18px;\" ></article>")
+					PublicInfo.append(rows[i].PublicInfo);
+					$("#show").append(Title);
+					$("#show").append(PublicInfo);
+					listIndex ++;
+				}
+		},
+		error : function(data) {
+			alert(data.respCode);
+		}
+
+	});
+}
+</script>
+<style type="text/css">
+html, body{
+    height: 100%;<!--高:百分比,解决不同尺寸的手机-->
+    width:100%;
+    overflow-x:hidden;
+	<!--滚动条:禁止横竖滚动条-->
+}
+</style> 
+</head>
+<body>
+     <article id="show">
+	</article>
+</body>
+</html>

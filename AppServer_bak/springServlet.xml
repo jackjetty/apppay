@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:mvc="http://www.springframework.org/schema/mvc" 
+	xmlns:util="http://www.springframework.org/schema/util"
+	xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation=" http://www.springframework.org/schema/beans
+	http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+ 	http://www.springframework.org/schema/context
+ 	http://www.springframework.org/schema/context/spring-context-3.0.xsd
+ 	http://www.springframework.org/schema/mvc
+ 	http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+    http://www.springframework.org/schema/util
+    http://www.springframework.org/schema/util/spring-util-3.0.xsd
+    http://www.springframework.org/schema/aop   
+    http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+ 	http://www.springframework.org/schema/tx 
+ 	http://www.springframework.org/schema/tx/spring-tx-3.1.xsd">
+	<!-- 默认扫描的包路径 -->
+	<context:component-scan base-package="com.rising"
+		use-default-filters="false">
+		<context:include-filter type="annotation"
+			expression="org.springframework.stereotype.Controller" />
+		<context:include-filter type="annotation"
+			expression="org.springframework.stereotype.Service" />
+		<context:include-filter type="annotation"
+			expression="org.springframework.stereotype.Repository" />
+	</context:component-scan>
+	<!-- 添加注解驱动 -->
+	<mvc:annotation-driven />
+	<mvc:default-servlet-handler />
+	<bean id="propertiesReader"
+		class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+		<property name="locations">
+			<list>
+				<value>classpath:redirectUrl.properties</value>
+				<value>classpath:key.properties</value>
+				<value>classpath:GeneralRedirectUrl.properties</value>
+			</list>
+		</property>
+	</bean>
+	
+	<bean id="multipartResolver"  
+		    class="org.springframework.web.multipart.commons.CommonsMultipartResolver">  
+		  
+		    <!-- one of the properties available; the maximum file size in bytes -->  
+		    <property name="maxUploadSize" value="100000"/>  
+	</bean> 
+	
+	
+	
+	
+	
+	
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource" destroy-method="close">
+		<property name="driverClass" value="com.mysql.jdbc.Driver"></property>
+		
+		<property name="jdbcUrl" value="jdbc:mysql://183.136.220.22:3306/appserver?useUnicode=true&amp;characterEncoding=GBK&amp;autoReconnect=true"> 
+		<!-- <property name="jdbcUrl" value="jdbc:jtds:sqlserver://127.0.0.1:1433/village;tds=8.0;lastupdatecount=true"> --> 
+		</property>	 
+		<property name="user" value="chapterless"></property>
+		<property name="password" value="123456"></property>
+		<property name="minPoolSize">
+			<value>5</value>
+		</property>
+		<property name="maxPoolSize">
+			<value>10</value>
+		</property>
+		<property name="maxIdleTime">
+			<value>1800</value>
+		</property>
+		<property name="acquireIncrement">
+			<value>5</value>
+		</property>
+		<property name="maxStatements">
+			<value>0</value>
+		</property>
+		<property name="initialPoolSize">
+			<value>2</value>
+		</property>
+		<property name="idleConnectionTestPeriod">
+			<value>1800</value>
+		</property>
+		<property name="acquireRetryAttempts">
+			<value>30</value>
+		</property>
+		<property name="breakAfterAcquireFailure">
+			<value>true</value>
+		</property>
+		<property name="checkoutTimeout">
+			<value>20000</value>
+		</property>
+		<property name="testConnectionOnCheckout">
+			<value>false</value>
+		</property>
+	</bean>
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate4.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource" />
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.dialect">org.hibernate.dialect.MySQLDialect</prop>
+				<prop key="hibernate.show_sql">false</prop>
+				<prop key="current_session_context_class">thread</prop>    
+				<!-- prop key="hibernate.hbm2ddl.auto">update</prop> -->
+				<!-- JDBC执行批量更新语句的大小 清除缓存（定期清除缓存，减小压力 -->
+				<prop key="hibernate.jdbc.batch_size">30</prop>
+				<prop key="hibernate.jdbc.use_scrollable_resultset">false</prop>
+			</props>
+		</property>
+		<property name="mappingDirectoryLocations">
+
+    <list>
+ 
+       <value>WEB-INF/classes/com/rising/appserver/pojo</value>
+
+    </list>
+
+</property>
+ 
+	</bean>
+	<aop:aspectj-autoproxy expose-proxy="true"/>
+	
+	<!-- 开启注解事务 只对当前配置文件有效 -->
+  	<tx:annotation-driven transaction-manager="txManager"/>
+
+    <bean id="txManager" class="org.springframework.orm.hibernate4.HibernateTransactionManager">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <tx:advice id="txAdvice" transaction-manager="txManager">
+        <tx:attributes>
+            <tx:method name="save*" propagation="REQUIRED" />
+            <tx:method name="add*" propagation="REQUIRED" />
+            <tx:method name="create*" propagation="REQUIRED" />
+            <tx:method name="insert*" propagation="REQUIRED" />
+            <tx:method name="update*" propagation="REQUIRED" />
+            <tx:method name="merge*" propagation="REQUIRED" />
+            <tx:method name="del*" propagation="REQUIRED" />
+            <tx:method name="remove*" propagation="REQUIRED" />
+            <tx:method name="put*" propagation="REQUIRED" />
+            <tx:method name="use*" propagation="REQUIRED"/>
+            <!--hibernate4必须配置为开启事务 否则 getCurrentSession()获取不到-->
+            <tx:method name="get*" propagation="REQUIRED" />
+            <tx:method name="count*" propagation="REQUIRED"  />
+            <tx:method name="find*" propagation="REQUIRED" />
+            <tx:method name="list*" propagation="REQUIRED"  />
+            <tx:method name="*" propagation="REQUIRED" />
+        </tx:attributes>
+    </tx:advice>
+    <aop:config expose-proxy="true">  
+        <aop:pointcut id="txPointcut" expression="execution(* com.rising.appserver.service.*.*(..))" />
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="txPointcut"/>
+    </aop:config> 
+    
+    
+    <bean id="mailSender" class="org.springframework.mail.javamail.JavaMailSenderImpl"
+        scope="singleton">
+		<property name="host">
+			<value>smtp.sina.com</value>
+		</property>
+		<property name="defaultEncoding" value="UTF-8"></property>  
+		<property name="javaMailProperties">
+			<props>
+				<prop key="mail.smtp.auth">true</prop>
+				<prop key="mail.smtp.timeout">25000</prop>
+			</props>
+		</property>
+		<property name="username">
+			<value>jian12000@sina.com</value>
+		</property>
+		<property name="password">
+			<value>12000jian</value>
+		</property>
+	</bean> 
+	
+    
+    <bean id="mailMessage" class="org.springframework.mail.SimpleMailMessage"
+        scope="prototype">
+        <property name="from" value="==?UTF-8?B?5YaJ5oCd56eR5oqA?=&lt;jian12000@sina.com&gt;" />
+        <property name="to" value="121437479@qq.com" />
+        <property name="cc">
+            <array>
+                <value>18757530227@139.com</value> 
+            </array>
+        </property>
+        <property name="bcc">
+            <array>
+                <value>shaoxing8642736@126.com</value>
+            </array>
+        </property>
+        <property name="subject" value="翼支付对账单" />
+    </bean>
+	
+</beans>

@@ -1,0 +1,355 @@
+/*** Eclipse Class Decompiler plugin, copyright (c) 2012 Chao Chen (cnfree2000@hotmail.com) ***/
+package com.bestpay.plugin;
+
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.res.AssetManager;
+import android.net.Uri;
+import android.os.Build;
+import android.os.Build.VERSION;
+import android.os.Bundle;
+import android.os.Environment;
+import android.os.Looper;
+import android.text.TextUtils;
+import android.widget.Toast;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.util.Hashtable;
+
+public class Plugin {
+	public static final int REQUEST_SUBMIT_ORDER = 1000;
+	public static final int REQUEST_BESTPAY_EXCHARGE = 1001;
+	public static final int REQUEST_THIRDPART_EXCHARGE = 1002;
+	public static final String ACCOUNTID = "ACCOUNTID";
+	public static final String ATTACH = "ATTACH";
+	public static final String ATTACHAMOUNT = "ATTACHAMOUNT";
+	public static final String BACKMERCHANTURL = "BACKMERCHANTURL";
+	public static final String CURTYPE = "CURTYPE";
+	public static final String CUSTOMERID = "CUSTOMERID";
+	public static final String DIVDETAILS = "DIVDETAILS";
+	public static final String GOODPAYTYPE = "GOODPAYTYPE";
+	public static final String GOODSCODE = "GOODSCODE";
+	public static final String GOODSNAME = "GOODSNAME";
+	public static final String GOODSNUM = "GOODSNUM";
+	public static final String BUSITYPE = "BUSITYPE";
+	public static final String MAC = "MAC";
+	public static final String KEY = "KEY";
+	public static final String MERCHANTID = "MERCHANTID";
+	public static final String MERCHANTPHONE = "MERCHANTPHONE";
+	public static final String MERCHANTPWD = "MERCHANTPWD";
+	public static final String MERCHANTUSERACOUNT = "USERACCOUNT";
+	public static final String ORDERAMOUNT = "ORDERAMOUNT";
+	public static final String ORDERREQTRANSEQ = "ORDERREQTRANSEQ";
+	public static final String ORDERSEQ = "ORDERSEQ";
+	public static final String ORDERTIME = "ORDERTIME";
+	public static final String ORDERVALIDITYTIME = "ORDERVALIDITYTIME";
+	public static final String PAYTYPE = "PAYTYPE";
+	public static final String PRODUCTAMOUNT = "PRODUCTAMOUNT";
+	public static final String PRODUCTDESC = "PRODUCTDESC";
+	public static final String PRODUCTID = "PRODUCTID";
+	public static final String SUBMERCHANTID = "SUBMERCHANTID";
+	public static final String USERIP = "USERIP";
+	public static int INSTALL_NEEDED = -1;
+	private static final float LIMIT_BILL_ORDER_AMOUNT = 50.0F;
+	private static final String PAY_TYPE_BILLPAY = "1";
+	private static final String ERR_FEILD_ORDAMOUNT = "ORDAMOUNT";
+	private static final String ERR_FEILD_ORDAMOUNT_LIMIT = "ORDAMOUNT_LIMIT";
+
+	public static void pay(Context context, Hashtable<String, String> params) {
+		CheckUpdterApk(context);
+		Bundle bundle = new Bundle();
+		bundle.putString("MERCHANTID", (String) params.get("MERCHANTID"));
+
+		if (TextUtils.isEmpty((CharSequence) params.get("SUBMERCHANTID")))
+			bundle.putString("SUBMERCHANTID", "");
+		else {
+			bundle.putString("SUBMERCHANTID",
+					(String) params.get("SUBMERCHANTID"));
+		}
+		bundle.putString("BUSITYPE", (String) params.get("BUSITYPE"));
+		bundle.putString("MAC", (String) params.get("MAC"));
+		bundle.putString("MERCHANTPWD", (String) params.get("MERCHANTPWD"));
+		bundle.putString("ORDERSEQ", (String) params.get("ORDERSEQ"));
+		bundle.putString("ORDERREQTRANSEQ",
+				(String) params.get("ORDERREQTRANSEQ"));
+		bundle.putString("ORDERTIME", (String) params.get("ORDERTIME"));
+		bundle.putString("ORDERVALIDITYTIME",
+				(String) params.get("ORDERVALIDITYTIME"));
+		bundle.putString("PRODUCTDESC", (String) params.get("PRODUCTDESC"));
+
+		if (TextUtils.isEmpty((CharSequence) params.get("CUSTOMERID")))
+			bundle.putString("CUSTOMERID", "");
+		else {
+			bundle.putString("CUSTOMERID", (String) params.get("CUSTOMERID"));
+		}
+
+		if (TextUtils.isEmpty((CharSequence) params.get("PRODUCTAMOUNT")))
+			bundle.putString("PRODUCTAMOUNT", "");
+		else {
+			bundle.putString("PRODUCTAMOUNT",
+					(String) params.get("PRODUCTAMOUNT"));
+		}
+
+		if (TextUtils.isEmpty((CharSequence) params.get("ATTACHAMOUNT")))
+			bundle.putString("ATTACHAMOUNT", "");
+		else {
+			bundle.putString("ATTACHAMOUNT",
+					(String) params.get("ATTACHAMOUNT"));
+		}
+
+		bundle.putString("CURTYPE", (String) params.get("CURTYPE"));
+		bundle.putString("BACKMERCHANTURL",
+				(String) params.get("BACKMERCHANTURL"));
+
+		if (TextUtils.isEmpty((CharSequence) params.get("ATTACH")))
+			bundle.putString("ATTACH", "");
+		else {
+			bundle.putString("ATTACH", (String) params.get("ATTACH"));
+		}
+
+		if (TextUtils.isEmpty((CharSequence) params.get("PRODUCTID")))
+			bundle.putString("PRODUCTID", "");
+		else {
+			bundle.putString("PRODUCTID", (String) params.get("PRODUCTID"));
+		}
+
+		bundle.putString("USERIP", (String) params.get("USERIP"));
+
+		if (TextUtils.isEmpty((CharSequence) params.get("DIVDETAILS")))
+			bundle.putString("DIVDETAILS", "");
+		else {
+			bundle.putString("DIVDETAILS", (String) params.get("DIVDETAILS"));
+		}
+
+		bundle.putString("ACCOUNTID", (String) params.get("ACCOUNTID"));
+		bundle.putString("KEY", (String) params.get("KEY"));
+
+		if (TextUtils.isEmpty((CharSequence) params.get("USERACCOUNT")))
+			bundle.putString("USERACCOUNT", "");
+		else {
+			bundle.putString("USERACCOUNT", (String) params.get("USERACCOUNT"));
+		}
+
+		if (TextUtils.isEmpty((CharSequence) params.get("MERCHANTPHONE")))
+			bundle.putString("MERCHANTPHONE", "");
+		else {
+			bundle.putString("MERCHANTPHONE",
+					(String) params.get("MERCHANTPHONE"));
+		}
+
+		if (TextUtils.isEmpty((CharSequence) params.get("GOODPAYTYPE")))
+			bundle.putString("GOODPAYTYPE", "");
+		else {
+			bundle.putString("GOODPAYTYPE", (String) params.get("GOODPAYTYPE"));
+		}
+
+		if (TextUtils.isEmpty((CharSequence) params.get("GOODSCODE")))
+			bundle.putString("GOODSCODE", "");
+		else {
+			bundle.putString("GOODSCODE", (String) params.get("GOODSCODE"));
+		}
+
+		if (TextUtils.isEmpty((CharSequence) params.get("GOODSNAME")))
+			bundle.putString("GOODSNAME", "");
+		else {
+			bundle.putString("GOODSNAME", (String) params.get("GOODSNAME"));
+		}
+
+		if (TextUtils.isEmpty((CharSequence) params.get("GOODSNUM")))
+			bundle.putString("GOODSNUM", "");
+		else {
+			bundle.putString("GOODSNUM", (String) params.get("GOODSNUM"));
+		}
+
+		Intent intent = new Intent();
+
+		String orderAmount = (String) params.get("ORDERAMOUNT");
+
+		String payType = (String) params.get("PAYTYPE");
+		double amount = 0.0D;
+		boolean amountFlag = true;
+		try {
+			amount = Double.parseDouble(orderAmount);
+		} catch (Exception e) {
+			amountFlag = false;
+		}
+		if (amountFlag) {
+			if ((amount > 0.0D) && (orderAmount.contains("."))) {
+				int index = orderAmount.lastIndexOf(".");
+				int len = orderAmount.substring(index + 1).length();
+
+				if (len > 2) {
+					amountFlag = false;
+				}
+			} else if (!(orderAmount.contains("."))) {
+				BigDecimal bd = new BigDecimal(orderAmount);
+				bd = bd.setScale(2, 4);
+				String orderstr = bd.toString();
+				amount = Double.parseDouble(orderstr);
+			} else {
+				amountFlag = false;
+			}
+		}
+
+		if (!(amountFlag)) {
+			Toast.makeText(context, "金额输入不正确,单位是元,小数点后两位", 0).show();
+			return;
+		}
+		DecimalFormat decimalFormat = new DecimalFormat("0.00");
+		if ("1".equals(payType)) {
+			if (amount > 50.0D) {
+				markErrFeildForIntent(intent, "ORDAMOUNT_LIMIT");
+			} else {
+				bundle.putString("ORDERAMOUNT", decimalFormat.format(amount));
+				intent.putExtras(bundle);
+				intent.setComponent(new ComponentName(
+						"com.chinatelecom.bestpayplugin",
+						"com.chinatelecom.bestpayplugin.BillPayActivity"));
+			}
+
+		} else {
+			bundle.putString("ORDERAMOUNT", decimalFormat.format(amount));
+			intent.putExtras(bundle);
+			intent.setComponent(new ComponentName(
+					"com.chinatelecom.bestpayplugin",
+					"com.chinatelecom.bestpayplugin.PaymentActivity"));
+		}
+
+		try {
+			((Activity) context).startActivityForResult(intent, 1000);
+		} catch (Exception localException1) {
+		}
+	}
+
+	public static void yzfClientRecharge(Context context, String phoneNum) {
+		CheckUpdterApk(context);
+		Bundle bundle = new Bundle();
+		bundle.putString("PHONENUM", phoneNum);
+		Intent intent = new Intent();
+		intent.putExtras(bundle);
+		intent.setComponent(new ComponentName("com.chinatelecom.bestpayplugin",
+				"com.chinatelecom.bestpayplugin.RechargeMainActivity"));
+		try {
+			((Activity) context).startActivityForResult(intent, 1001);
+		} catch (Exception localException) {
+		}
+	}
+
+	public static void userClientRecharge(Context context, String phoneNum) {
+		CheckUpdterApk(context);
+		Bundle bundle = new Bundle();
+		bundle.putString("PHONENUM", phoneNum);
+		Intent intent = new Intent();
+		intent.putExtras(bundle);
+		intent.setComponent(new ComponentName("com.chinatelecom.bestpayplugin",
+				"com.chinatelecom.bestpayplugin.RechargeLoginActivity"));
+		try {
+			((Activity) context).startActivityForResult(intent, 1002);
+		} catch (Exception localException) {
+		}
+	}
+
+	@SuppressLint({ "WorldReadableFiles", "NewApi" })
+	private static boolean copyApkFromAssets(Context context, String fileName) {
+		boolean copyIsFinish = false;
+		if (Environment.getExternalStorageState().equals("mounted")) {
+			String path = Environment.getExternalStorageDirectory()
+					.getAbsolutePath() + "/bestpay";
+			if (!(new File(path).exists())) {
+				new File(path).mkdirs();
+			}
+
+			path = path + "/BestpayClient.apk";
+			if (new File(path).exists()) {
+				new File(path).delete();
+			}
+			try {
+				InputStream is = context.getAssets().open(fileName);
+				File file = new File(path);
+				file.createNewFile();
+				if (Build.VERSION.SDK_INT >= 9) {
+					file.setWritable(true, false);
+					file.setReadable(true, false);
+				}
+
+				FileOutputStream fos = new FileOutputStream(file);
+				byte[] temp = new byte[1024];
+				int i = 0;
+				while ((i = is.read(temp)) > 0) {
+					fos.write(temp, 0, i);
+				}
+				fos.flush();
+				fos.close();
+				is.close();
+				copyIsFinish = true;
+			} catch (IOException e) {
+				return copyIsFinish;
+			}
+
+			Intent intent = new Intent("android.intent.action.VIEW");
+			intent.addFlags(268435456);
+			intent.setDataAndType(Uri.parse("file://"
+					+ Environment.getExternalStorageDirectory()
+							.getAbsolutePath() + "/bestpay/BestpayClient.apk"),
+					"application/vnd.android.package-archive");
+			context.startActivity(intent);
+		} else {
+			Intent intent = new Intent();
+			intent.addFlags(268435456);
+			intent.setAction("android.intent.action.VIEW");
+			String type = "application/vnd.android.package-archive";
+			try {
+				InputStream is = context.getClass().getResourceAsStream(
+						"/assets/BestpayClient.apk");
+				FileOutputStream fos = context.openFileOutput(
+						"BestpayClient.apk", 1);
+
+				byte[] buffer = new byte[1024];
+				int len = 0;
+				while ((len = is.read(buffer)) != -1) {
+					fos.write(buffer, 0, len);
+				}
+				fos.flush();
+				is.close();
+				fos.close();
+			} catch (Exception e) {
+				return copyIsFinish;
+			}
+
+			File f = new File(context.getFilesDir().getPath()
+					+ "/BestpayClient.apk");
+
+			intent.setDataAndType(Uri.fromFile(f), type);
+			context.startActivity(intent);
+			copyIsFinish = true;
+		}
+		return copyIsFinish;
+	}
+
+	private static void markErrFeildForIntent(Intent intent, String feild) {
+		Bundle msgBundle = new Bundle();
+		msgBundle.putString("error_feild", feild);
+		intent.putExtras(msgBundle);
+		intent.setComponent(new ComponentName("com.chinatelecom.bestpayplugin",
+				"com.chinatelecom.bestpayplugin.widget.CheckFailedActivity"));
+	}
+
+	public static void CheckUpdterApk(Context context) {
+		final CheckApkUpdater cau = new CheckApkUpdater(context);
+		final Context mContext=context;
+		new Thread(new Runnable( ) {
+			public void run() {
+				Looper.prepare();
+				cau.ApkUpdater(mContext);
+				Looper.loop();
+			}
+		}).start();
+	}
+}

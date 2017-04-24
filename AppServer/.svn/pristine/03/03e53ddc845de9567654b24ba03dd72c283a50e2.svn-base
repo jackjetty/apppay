@@ -1,0 +1,11 @@
+package com.rising.web.service;
+public interface IHBpayService {    
+    //phonenumber,qqnumber,qqcount,paymoney,productid
+	
+	public static String bestPayUrl="/general/order/unSmsPay";
+    public String rechargeQQ(String accessVoucher, String parasXml);
+    public String channelStatus(String accessVoucher, String parasXml);
+    
+    //Monthly quota
+    
+}  

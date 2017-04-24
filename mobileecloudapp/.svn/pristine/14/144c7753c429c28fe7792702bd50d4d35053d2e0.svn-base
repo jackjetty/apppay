@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout android:layout_width="fill_parent" android:layout_height="fill_parent"
+  xmlns:android="http://schemas.android.com/apk/res/android"
+  android:background="@color/main_bg_color" >
+   <include 
+        android:id="@+id/topTitle" 
+        layout="@layout/title_bar"  
+     /> 
+     <ScrollView
+        android:layout_width="fill_parent"
+        android:layout_height="fill_parent"
+        android:fadingEdge="none"
+        android:scrollbars="vertical" 
+        android:layout_below="@id/topTitle">
+        
+         <LinearLayout
+             android:id="@+id/ll_ICCard"  
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:orientation="vertical" >
+            
+		   
+		  
+           
+          <LinearLayout 
+               android:gravity="center_vertical"  
+                android:background="@drawable/settings_mid" 
+                android:paddingTop="10.0dip" 
+                android:paddingBottom="10.0dip" 
+                android:layout_marginTop="@dimen/row_margin"  
+                android:layout_width="fill_parent" 
+                android:layout_height="@dimen/row_height" 
+                >
+		        <TextView 
+		             
+		            android:textSize="@dimen/textSize_normal" 
+		            android:textColor="@color/key_gray"
+		            android:paddingLeft="5.0dip" 
+		            android:layout_width="45dip"
+		            android:layout_height="wrap_content" 
+		            android:text="姓名" />
+		        <EditText 
+		            android:id="@+id/et_AccountName"
+		            android:textSize="@dimen/textSize_normal" 
+		            android:textColorHint="@color/value_gray"  
+		            android:background="@null" 
+		            android:layout_width="fill_parent"
+		             android:layout_height="wrap_content" 
+		             android:layout_marginLeft="10.0dip" 
+		              android:hint="请输入持卡人姓名"
+		              android:maxLength="4" 
+		             
+                  />
+		  </LinearLayout>
+           
+          <LinearLayout 
+               android:gravity="center_vertical"  
+                android:background="@drawable/settings_mid" 
+                android:paddingTop="10.0dip" 
+                android:paddingBottom="10.0dip"  
+                android:layout_width="fill_parent" 
+                android:layout_height="@dimen/row_height" 
+                >
+		        <TextView 
+		            android:textSize="@dimen/textSize_normal" 
+		            android:textColor="@color/key_gray"
+		            android:paddingLeft="5.0dip" 
+		            android:layout_width="45dip"
+		            android:layout_height="wrap_content" 
+		            android:text="卡号" />
+		        <EditText 
+		            android:id="@+id/et_ICCardNum"
+		            android:textSize="@dimen/textSize_normal" 
+		            android:textColorHint="@color/value_gray"  
+		            android:background="@null" 
+		            android:layout_width="fill_parent"
+		             android:layout_height="wrap_content" 
+		             android:layout_marginLeft="10.0dip" 
+		             android:hint="请输入一卡通卡号(学员号/教工号)"
+		             
+                  />
+		  </LinearLayout>
+           <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:background="@drawable/divider" />
+           <FrameLayout 
+               
+               android:gravity="center_vertical" 
+               android:background="@drawable/settings_mid" 
+               android:paddingTop="0.0dip" 
+               android:paddingBottom="0.0dip" 
+               android:layout_width="fill_parent" 
+               android:layout_height="@dimen/row_height"
+               android:layout_marginTop="@dimen/row_margin"  
+               
+                >
+		        <TextView 
+		            android:textSize="@dimen/textSize_normal" 
+		            android:textColor="@color/key_gray"
+		            android:paddingLeft="5.0dip" 
+		            android:layout_width="90dip"
+		            android:layout_height="wrap_content" 
+		             android:layout_gravity="center_vertical"
+		            android:text="充值金额" />
+		         
+		        <EditText 
+		             android:id="@+id/et_Amount" 
+		             android:textSize="@dimen/textSize_normal" 
+		             android:textColorHint="@color/list_text_small_color"   
+		             android:background="@null"
+		             android:layout_width="fill_parent" 
+		             android:layout_height="fill_parent" 
+		             android:layout_marginLeft="100.0dip"  
+		             android:layout_gravity="center_vertical"
+		             android:editable="false"
+		             android:hint="选择充值金额" /> 
+		             
+		        <ImageView 
+		            android:layout_width="25dp"
+		            android:layout_height="25dp"
+		            android:src="@drawable/arrow_down"
+		            android:scaleType="center" 
+		            android:layout_gravity="right|center_vertical"
+		            android:layout_marginRight="10dp"
+		            />
+		        
+		  </FrameLayout>
+		  <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dip"
+                android:background="@drawable/settings_mid" 
+                android:gravity="center_vertical"
+                android:orientation="horizontal" > 
+                <TextView 
+		            android:textSize="@dimen/textSize_normal" 
+		            android:textColor="@color/key_gray"
+		            android:paddingLeft="5.0dip" 
+		            android:layout_width="80dip"
+		            android:layout_height="wrap_content" 
+		             android:layout_gravity="center_vertical"
+		             
+		            android:text="充值对象" />
+                
+                <CheckBox
+		            android:id="@+id/cb_ObjPhone"
+		            style="@style/custom_checkbox_style"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:paddingTop="5dip"
+		            android:paddingBottom="5dip"
+		            android:layout_marginLeft="6dp"
+		            android:drawablePadding="2dp"
+		            android:text="一卡通（手机）"
+		             
+		            android:button="@drawable/btn_check_item_selector"
+		            android:textSize="12sp"  /> 
+		        <CheckBox
+		            android:id="@+id/cb_ObjCard"
+		            style="@style/custom_checkbox_style"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:paddingTop="5dip"
+		            android:layout_marginLeft="6dp"
+		            android:drawablePadding="2dp"
+		            android:paddingBottom="5dip" 
+		            android:text="一卡通（卡）"
+		            android:button="@drawable/btn_check_item_selector"
+		            android:textSize="12sp"  /> 
+		 </LinearLayout>
+           
+           
+		  <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="1px"
+                android:background="@drawable/divider" />
+           
+           <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="10dip"
+                android:gravity="center_vertical"
+                android:orientation="horizontal" > 
+                
+                <CheckBox
+		            android:id="@+id/cb_Agree"
+		            style="@style/custom_checkbox_style"
+		            android:layout_width="wrap_content"
+		            android:layout_height="wrap_content"
+		            android:paddingTop="5dip"
+		            android:paddingBottom="5dip"
+		            android:text=""
+		            android:button="@drawable/cust_check_box_bg"
+		            android:textSize="14sp"  /> 
+                <TextView
+                    android:id="@+id/tv_RechargeInstruction"
+                    android:paddingLeft="3dip"
+                    android:textSize="@dimen/textSize_normal" 
+                    android:textColor="@color/text_blue"
+                    android:text="同意《校园一卡通用户服务协议》"
+                     android:singleLine="true"  
+                     android:ellipsize="end" 
+                    android:gravity="center_vertical"
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1" /> 
+            </LinearLayout>
+		  
+           
+            
+            
+           
+           <Button
+                android:id="@+id/btn_Recharge"
+                android:layout_width="fill_parent"
+                android:layout_height="50dip"
+                android:layout_marginLeft="8dip"
+                android:layout_marginRight="8dip"
+                android:layout_marginTop="20dip"
+                android:background="@drawable/btn_submit"
+                android:shadowColor="#7f000000"
+                android:shadowDx="0.0"
+                android:shadowDy="1.0"
+                android:shadowRadius="1.0"
+                android:text="充值"
+                android:textColor="#ffffff"
+                android:textSize="18sp" 
+                android:enabled="true"/>
+           
+           
+           
+           <TextView
+		        android:id="@+id/tv_Prompt"
+		        android:layout_width="fill_parent"
+		        android:layout_height="wrap_content"
+		        android:layout_gravity="center_vertical"
+		        android:layout_marginLeft="15dip"
+		        android:layout_marginRight="15dip"
+		        android:layout_marginTop="20dip"
+		        android:layout_marginBottom="10dip"
+		        android:drawablePadding="3dip" 
+		        android:padding="3.0dip"
+		        android:singleLine="false" 
+		        android:textColor="#d02020"
+		        android:lineSpacingExtra="3dp"
+		        android:textSize="13.0dip" 
+		        />
+		   
+         </LinearLayout>
+    </ScrollView> 
+</RelativeLayout>

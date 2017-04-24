@@ -1,0 +1,42 @@
+package com.rising.appserver.action;
+import java.io.IOException; 
+import java.util.HashMap;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse; 
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.dom4j.DocumentException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestMapping; 
+
+import com.google.gson.Gson;
+import com.rising.appserver.common.BaseAction;
+import com.rising.appserver.service.BillBalanceService;
+import com.rising.appserver.service.ChargeService;
+@Controller
+@RequestMapping("/billBalance")
+public class BillBalance  extends BaseAction{
+	private Log log = LogFactory.getLog(BillBalance.class);
+	
+	
+	@Autowired 
+	private BillBalanceService billBalanceService;
+	@RequestMapping("/telecom")
+	public void telecom(HttpServletRequest request,HttpServletResponse response){
+		String phoneNumber=request.getParameter("phoneNumber"); 
+		String cityCode=request.getParameter("cityCode"); 
+		HashMap<String,Object> result = new HashMap<String,Object>(); 
+		result=billBalanceService.telecomBalance(phoneNumber, cityCode);
+		result.put("phoneNumber", phoneNumber);
+		result.put("cityCode", cityCode);
+				
+		String resultGson;
+		resultGson = new Gson().toJson(result);
+		writerGson(resultGson,request, response);
+	}
+     
+}
+ 

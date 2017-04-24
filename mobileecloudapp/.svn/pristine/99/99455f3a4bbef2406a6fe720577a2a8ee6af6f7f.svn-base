@@ -1,0 +1,215 @@
+package com.ris.mobile.ecloud.activity;
+
+
+import android.annotation.SuppressLint;
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.os.Handler;
+import android.support.v4.app.Fragment;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+ 
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+
+import com.ris.mobile.ecloud.BaseActivity;
+import com.ris.mobile.ecloud.LApplication;
+import com.ris.mobile.ecloud.R;
+ 
+import com.ris.mobile.ecloud.adapter.ICCardBillRecycleAdapter;
+import com.ris.mobile.ecloud.log.CommonLog;
+import com.ris.mobile.ecloud.log.LogFactory;
+import com.ris.mobile.ecloud.object.ConnectErrorObject;
+import com.ris.mobile.ecloud.object.ICDealRecordObject;
+import com.ris.mobile.ecloud.object.RequestObject;
+import com.ris.mobile.ecloud.parser.BaseParser;
+import com.ris.mobile.ecloud.parser.ICDealRecordListParser;
+import com.ris.mobile.ecloud.util.SharedPreferenceUtil;
+import com.ris.mobile.ecloud.widget.PullLoadMoreRecyclerView;
+ 
+
+
+/**
+ * A simple {@link Fragment} subclass.
+ */
+public class TestBillActivity   extends BaseActivity implements  OnClickListener  {
+	 
+	
+	
+	private TextView tvBack;
+	private TextView tvTitle; 
+	private TextView tvRight;
+    private PullLoadMoreRecyclerView mPullLoadMoreRecyclerView;
+    
+    public static LApplication lApplication=LApplication.getInstance();
+    private Context mContext; 
+	 
+	private List<ICDealRecordObject> data;
+	private int pageIndex=1;
+	private int pageSize=15;
+	private SharedPreferenceUtil sharedPreferenceUtil; 
+ 
+    private ICCardBillRecycleAdapter mICCardBillRecycleAdapter;
+
+
+    public void onCreate(Bundle savedInstanceState) {
+		super.onCreate(savedInstanceState);
+		setContentView(R.layout.activity_testbill);
+		initData(getIntent());
+		findViewById();
+		initView();
+		setListener();
+	 
+	}
+    
+    public    void initData(Intent intent){ 
+		mContext=TestBillActivity.this;
+		sharedPreferenceUtil=new SharedPreferenceUtil(mContext);
+	}
+    
+    
+   
+    
+    
+    public void findViewById(){
+		tvBack=(TextView) findViewById(R.id.tv_Back);
+    	tvTitle=(TextView) findViewById(R.id.tv_Title); 
+    	tvRight=(TextView) findViewById(R.id.tv_Right); 
+    	mPullLoadMoreRecyclerView=(PullLoadMoreRecyclerView) findViewById(R.id.rv_PullLoadMore); 
+    	 
+	}
+    
+    @SuppressLint("ResourceAsColor")
+	public void initView(){
+	  	  
+		tvBack.setVisibility(View.VISIBLE);
+    	tvTitle.setVisibility(View.VISIBLE);
+    	tvTitle.setText(R.string.title_iccardbill);
+    	tvRight.setVisibility(View.INVISIBLE);
+    	 
+    	
+    	//设置下拉刷新是否可见
+        mPullLoadMoreRecyclerView.setRefreshing(true);
+        //设置是否可以下拉刷新
+        mPullLoadMoreRecyclerView.setPullRefreshEnable(true);
+        //设置是否可以上拉刷新
+        mPullLoadMoreRecyclerView.setPushRefreshEnable(true);
+        //显示下拉刷新
+        mPullLoadMoreRecyclerView.setRefreshing(true);
+        //设置上拉刷新文字
+        mPullLoadMoreRecyclerView.setFooterViewText("loading");
+        //设置上拉刷新文字颜色
+        mPullLoadMoreRecyclerView.setFooterViewTextColor(R.color.white);
+        //设置加载更多背景色
+        mPullLoadMoreRecyclerView.setFooterViewBackgroundColor(R.color.main_bg_color);
+        mPullLoadMoreRecyclerView.setLinearLayout();
+
+        mPullLoadMoreRecyclerView.setOnPullLoadMoreListener(new PullLoadMoreListener());
+        mPullLoadMoreRecyclerView.setEmptyView(LayoutInflater.from(mContext).inflate(R.layout.empty_layout_testbill, null));//setEmptyView
+        
+        data =  new ArrayList<ICDealRecordObject>(); 
+    	mICCardBillRecycleAdapter = new ICCardBillRecycleAdapter(mContext,data);   
+    	mPullLoadMoreRecyclerView.setAdapter(mICCardBillRecycleAdapter); 
+    	
+        getData(true); 
+        
+    	 
+      }
+    
+
+    
+
+    private void getData(boolean isRefresh) {
+	    	if (isRefresh) {  
+			    pageIndex=1;
+			    data.clear();
+	        } else {   
+	        	pageIndex++;    
+	        }  
+    	    pageIndex=pageIndex<1?1:pageIndex;
+		    
+	        BaseParser<List<ICDealRecordObject>> responseParser = new ICDealRecordListParser();
+	        
+			HashMap<String, String> requestDataMap=new HashMap<String, String>();
+			 
+			requestDataMap.put("pageNo",  new Integer(pageIndex).toString() );
+			requestDataMap.put("pageSize", new Integer(pageSize).toString()  );  
+			requestDataMap.put("userId",  sharedPreferenceUtil.getUserId() );
+			
+				
+			RequestObject vo = new RequestObject(R.string.url_icdealrecordlist, mContext, requestDataMap, responseParser); 
+		    getDataFromServer(vo, new  DataCallback<List<ICDealRecordObject>>() {
+					@Override
+					public void processData(List<ICDealRecordObject> paramObject, boolean paramBoolean) { 
+						 
+				    	if(paramObject!=null&&paramObject.size()>0)
+				    		data.addAll(paramObject);
+				    	else
+				    		pageIndex--; 
+				    	 
+				    	 
+                         mICCardBillRecycleAdapter.notifyDataSetChanged();
+                         mPullLoadMoreRecyclerView.setPullLoadMoreCompleted(); 
+                         
+						 return  ;
+					}
+					@Override
+		    		public void processError(ConnectErrorObject responseErrorVo){ 
+						 
+						 DisPlay("error",responseErrorVo.getErrInfo());
+						 
+		    		}
+			},false); 
+    	
+    	 
+
+    }
+
+    public void clearData() {
+    	mICCardBillRecycleAdapter.getDataList().clear();
+    	mICCardBillRecycleAdapter.notifyDataSetChanged();
+    }
+
+    public void setListener(){
+    	tvBack.setOnClickListener(this);  
+    	 
+    	
+    }
+    
+    @Override
+	 public void onClick(View v) {
+			// TODO Auto-generated method stub
+			switch (v.getId()) {
+			  case R.id.tv_Back:
+				 this.finish();
+				 break; 
+		    }
+			
+			
+		} 
+
+    class PullLoadMoreListener implements PullLoadMoreRecyclerView.PullLoadMoreListener {
+        @Override
+        public void onRefresh() {
+        	log.e("onRefresh "+pageIndex);
+            getData(true);
+        }
+
+        @Override
+        public void onLoadMore() {
+        	 log.e("onLoadMore "+pageIndex);
+          
+            getData(false);
+        }
+    }
+
+    
+}
